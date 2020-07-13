@@ -1,14 +1,11 @@
 language: node_js
 node_js:
-  - "10"
+  - "14"
 branches:
   only:
     - master
 install:
   - npm ci
-cache:
-  directories:
-    - node_modules
 script:
   - NODE_ENV=test npm run-script test-travis
 after_success:

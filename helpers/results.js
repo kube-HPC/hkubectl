@@ -28,21 +28,21 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, execResult, noResult
             spinner.fail();
             jobStatus = status;
             console.log(`exec ${jobId} ${status}`)
-            return { jobStatus }
+            return { jobId, jobStatus }
         }
         if (noResult) {
             spinner.succeed();
-            return { jobStatus, jobId }
+            return { jobId, jobStatus }
         }
         const execResult = await get({ endpoint, rejectUnauthorized, path: `exec/results/${jobId}` });
         if (execResult.error) {
             spinner.fail();
-            return { jobStatus, error: execResult.error };
+            return { jobStatus, error: execResult.error, jobId };
         }
         spinner.succeed();
         jobResult = execResult.result.data;
     }
-    return { jobStatus, jobResult };
+    return { jobId, jobStatus, jobResult };
 }
 
 module.exports = {
