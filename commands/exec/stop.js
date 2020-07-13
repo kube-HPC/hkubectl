@@ -21,16 +21,6 @@ module.exports = {
     description: 'call to stop pipeline execution',
     options: {
     },
-    builder: {
-        jobId: {
-            demandOption: true,
-            type: 'string'
-        },
-        reason: {
-            demandOption: false,
-            type: 'string'
-        }
-    },
     handler: async (argv) => {
         const ret = await executeHandler(argv);
         console.log(prettyjson.render(ret));
