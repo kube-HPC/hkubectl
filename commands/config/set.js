@@ -5,7 +5,7 @@ const fs = require('fs-extra');
 const { writeValue } = require('../../helpers/config');
 
 const handler = async ({ key, value }) => {
-    return writeValue;
+    return writeValue({ key, value });
 }
 
 module.exports = {
