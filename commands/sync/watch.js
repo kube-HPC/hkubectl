@@ -23,7 +23,7 @@ const watchHandler = async ({ endpoint, rejectUnauthorized, algorithmName, folde
         }
 
         await syncthing.start({ algorithmName, tunnelUrl: `${endpoint}/${agentRestIngressPath}`, tunnelPort });
-        await syncthing.addFolder({ folderPath: fullPath, algorithmName, bidi });
+        await syncthing.addFolder({ path: fullPath, algorithmName, bidi });
         syncthing.on('event', data => {
             if (data.folder !== algorithmName) {
                 return;
