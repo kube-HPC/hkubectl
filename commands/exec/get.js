@@ -1,8 +1,8 @@
 const { get } = require('../../helpers/request-helper');
 const { log } = require('../../helpers/output');
 
-const getHandler = async ({ endpoint, rejectUnauthorized, name }) => {
-    const path = `store/pipelines/${name || ''}`;
+const getHandler = ({ endpoint, rejectUnauthorized, jobId }) => {
+    const path = `exec/pipelines/${jobId}`;
     return get({
         endpoint,
         rejectUnauthorized,
@@ -11,8 +11,8 @@ const getHandler = async ({ endpoint, rejectUnauthorized, name }) => {
 };
 
 module.exports = {
-    command: 'get [name]',
-    description: 'Gets an pipeline by name',
+    command: 'get <jobId>',
+    description: 'Returns the executed pipeline data',
     options: {
     },
     builder: {},
