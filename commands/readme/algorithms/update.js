@@ -1,16 +1,15 @@
+const fse = require('fs-extra');
 const { log } = require('../../../helpers/output');
-const { put, get, putFile } = require('../../helpers/request-helper');
-const merge = require('lodash.merge');
-const fse = require("fs-extra");
+const { putFile } = require('../../../helpers/request-helper');
 
-const readmeUpdate = async (readmeFile, endpoint, rejectUnauthorized, name) => {
+const handleUpdate = async (readmeFile, endpoint, rejectUnauthorized, name) => {
     const path = `readme/algorithms/${name}`;
-    let stream = fse.createReadStream(readmeFile);
+    const stream = fse.createReadStream(readmeFile);
     const formData = {
-        "README.md": {
+        'README.md': {
             value: stream,
             options: {
-                filename: "README.md"
+                filename: 'README.md'
             }
         }
     };
@@ -20,6 +19,7 @@ const readmeUpdate = async (readmeFile, endpoint, rejectUnauthorized, name) => {
         formData,
         path
     });
+    return result;
 };
 
 module.exports = {
@@ -31,11 +31,11 @@ module.exports = {
     builder: {
         readmeFile: {
             describe: 'path for readme file. example: --readmeFile="./readme.md',
-            type: "string"
+            type: 'string'
         }
     },
     handler: async (argv) => {
         const ret = await handleUpdate(argv);
-        console.log(prettyjson.render(ret));
+        log(ret);
     }
-}
+};

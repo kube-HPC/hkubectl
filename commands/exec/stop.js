@@ -1,19 +1,19 @@
 const { log } = require('../../helpers/output');
 const { post } = require('../../helpers/request-helper');
-const path = `exec/stop/`;
+const path = 'exec/stop/';
 
 const executeHandler = async ({ endpoint, rejectUnauthorized, jobId, reason }) => {
     const body = {
         jobId,
         reason
-    }
+    };
     return post({
         endpoint,
         rejectUnauthorized,
         path,
         body
     });
-}
+};
 
 module.exports = {
     command: 'stop <jobId> [reason]',
@@ -25,4 +25,4 @@ module.exports = {
         const ret = await executeHandler(argv);
         log(ret);
     }
-}
+};

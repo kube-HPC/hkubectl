@@ -1,12 +1,12 @@
+const fs = require('fs-extra');
 const { log } = require('../../helpers/output');
-const fs = require('fs-extra')
 const { resolveConfigPath } = require('../../helpers/config');
 
 const handler = async () => {
     const configPath = await resolveConfigPath(true);
     const config = await fs.readJson(configPath);
     return config;
-}
+};
 
 module.exports = {
     command: 'get',
@@ -19,4 +19,4 @@ module.exports = {
         const ret = await handler(argv);
         log(ret);
     }
-}
+};

@@ -1,4 +1,4 @@
-const { get } = require('../../helpers/request-helper');
+const { get } = require('../../../helpers/request-helper');
 const { log } = require('../../../helpers/output');
 
 const list = async (argv) => {
@@ -7,7 +7,7 @@ const list = async (argv) => {
         ...argv,
         path
     });
-}
+};
 
 module.exports = {
     command: 'list',
@@ -18,6 +18,6 @@ module.exports = {
     builder: {},
     handler: async (argv) => {
         const ret = await list(argv);
-        log(ret,{ inlineArrays: true });
+        log(ret, { inlineArrays: true });
     }
-}
+};

@@ -7,6 +7,7 @@
     "hkubectl": "./hkubectl"
   },
   "scripts": {
+    "lint": "./node_modules/eslint/bin/eslint.js .",
     "test": "mocha test --colors --recursive",
     "test-travis": "echo No tests specified",
     "build-linux": "./scripts/build.sh linux",
@@ -37,6 +38,7 @@
     "fs-extra": "^9.0.1",
     "get-port": "^5.1.1",
     "inquirer": "^7.2.0",
+    "js-yaml": "^3.14.0",
     "lodash.merge": "^4.6.2",
     "md5": "^2.2.1",
     "object-path": "^0.11.4",
@@ -50,6 +52,9 @@
   },
   "devDependencies": {
     "chai": "^4.1.2",
+    "eslint": "^7.5.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.1.1",
     "pkg": "4.3.8"

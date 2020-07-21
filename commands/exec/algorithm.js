@@ -1,11 +1,9 @@
 const yaml = require('js-yaml');
-const { log } = require('../../helpers/output');
 const fse = require('fs-extra');
+const { log } = require('../../helpers/output');
 const { post } = require('../../helpers/request-helper');
 const { waitForBuild } = require('../../helpers/results');
-const path = `exec/algorithm/`;
-
-
+const path = 'exec/algorithm/';
 
 const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait, noResult }) => {
     let loadResult;
@@ -15,7 +13,7 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait
     }
     const body = {
         name, ...loadResult
-    }
+    };
     const execResult = await post({
         endpoint,
         rejectUnauthorized,
@@ -28,9 +26,8 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait
     if (noWait) {
         return execResult.result;
     }
-    return waitForBuild({ endpoint, rejectUnauthorized, execResult: execResult.result, noResult })
-
-}
+    return waitForBuild({ endpoint, rejectUnauthorized, execResult: execResult.result, noResult });
+};
 
 module.exports = {
     command: 'algorithm [name]',
@@ -39,7 +36,7 @@ module.exports = {
     options: {
     },
     builder: {
-        'file': {
+        file: {
             demandOption: false,
             describe: 'file path/name for extra data',
             type: 'string',
@@ -60,4 +57,4 @@ module.exports = {
         const ret = await executeHandler(argv);
         log(ret);
     }
-}
+};

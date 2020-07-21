@@ -2,13 +2,13 @@ const { del } = require('../../../helpers/request-helper');
 const { log } = require('../../../helpers/output');
 
 const delHandler = async ({ endpoint, rejectUnauthorized, name }) => {
-    const path = `store/algorithms/${name}`
+    const path = `store/algorithms/${name}`;
     return del({
         endpoint,
         rejectUnauthorized,
         path
     });
-}
+};
 
 module.exports = {
     command: 'delete <name>',
@@ -18,6 +18,6 @@ module.exports = {
     builder: {},
     handler: async (argv) => {
         const ret = await delHandler(argv);
-        console.log(prettyjson.render(ret));
+        log(ret);
     }
-}
+};

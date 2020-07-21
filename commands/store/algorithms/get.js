@@ -2,13 +2,13 @@ const { get } = require('../../../helpers/request-helper');
 const { log } = require('../../../helpers/output');
 
 const getHandler = async ({ endpoint, rejectUnauthorized, name }) => {
-    const path = `store/algorithms/${name}`
+    const path = `store/algorithms/${name}`;
     return get({
         endpoint,
         rejectUnauthorized,
         path
     });
-}
+};
 
 module.exports = {
     command: 'get <name>',
@@ -21,4 +21,4 @@ module.exports = {
         const ret = await getHandler(argv);
         log(ret);
     }
-}
+};

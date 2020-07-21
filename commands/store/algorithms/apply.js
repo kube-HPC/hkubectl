@@ -1,7 +1,6 @@
 const { log } = require('../../../helpers/output');
 const { handleApply } = require('./applyImpl');
 const { askMissingValues } = require('../../../helpers/input');
-const input = require('../../../helpers/input');
 
 module.exports = {
     command: 'apply [name]',
@@ -52,22 +51,22 @@ module.exports = {
                 type: 'boolean',
                 default: false
             }
-        }
-        yargs.middleware(async (args, yargs) => {
-            if (args.file){
-                return;
+        };
+        yargs.middleware((args) => {
+            if (args.file) {
+                return null;
             }
             const fillMissing = [
                 { name: 'env', type: 'list' },
                 { name: 'codeEntryPoint', type: 'input' },
-                { name: 'codePath', type: 'input', default: './', when: answers=>!answers.file }
+                { name: 'codePath', type: 'input', default: './', when: answers => !answers.file }
 
-            ]
-            return await askMissingValues(fillMissing, options, args);
-        })
-        yargs.options(options)
+            ];
+            return askMissingValues(fillMissing, options, args);
+        });
+        yargs.options(options);
 
-        yargs.completion()
+        yargs.completion();
         return yargs;
     },
     handler: async (argv) => {
@@ -76,4 +75,4 @@ module.exports = {
             log(ret.error);
         }
     }
-}
+};

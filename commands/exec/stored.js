@@ -1,12 +1,12 @@
 const yaml = require('js-yaml');
-const { log } = require('../../helpers/output');
 const fse = require('fs-extra');
+const { log } = require('../../helpers/output');
 const { post } = require('../../helpers/request-helper');
 const { waitForBuild } = require('../../helpers/results');
 
-const path = `exec/stored/`;
+const path = 'exec/stored/';
 
-const executeHandler = async ({ endpoint, rejectUnauthorized, name,noWait,noResult, file }) => {
+const executeHandler = async ({ endpoint, rejectUnauthorized, name, noWait, noResult, file }) => {
     let result;
 
     if (file) {
@@ -14,7 +14,7 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, name,noWait,noResu
     }
     const body = {
         name, ...result
-    }
+    };
     const execResult = await post({
         endpoint,
         rejectUnauthorized,
@@ -27,9 +27,8 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, name,noWait,noResu
     if (noWait) {
         return execResult.result;
     }
-    return waitForBuild({ endpoint, rejectUnauthorized, execResult: execResult.result,noResult })
-
-}
+    return waitForBuild({ endpoint, rejectUnauthorized, execResult: execResult.result, noResult });
+};
 
 module.exports = {
     command: 'stored [name]',
@@ -38,7 +37,7 @@ module.exports = {
     options: {
     },
     builder: {
-        'file': {
+        file: {
             demandOption: false,
             describe: 'file path/name for running pipeline',
             type: 'string',
@@ -59,4 +58,4 @@ module.exports = {
         const ret = await executeHandler(argv);
         log(ret);
     }
-}
+};

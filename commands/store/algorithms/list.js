@@ -7,7 +7,7 @@ const list = async (argv) => {
         ...argv,
         path
     });
-}
+};
 
 module.exports = {
     command: 'list',
@@ -20,4 +20,4 @@ module.exports = {
         const ret = await list(argv);
         log(ret, { inlineArrays: true });
     }
-}
+};

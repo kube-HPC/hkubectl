@@ -1,8 +1,8 @@
 const yaml = require('js-yaml');
-const { log } = require('../../helpers/output');
 const fse = require('fs-extra');
+const { log } = require('../../helpers/output');
 const { post } = require('../../helpers/request-helper');
-const path = `exec/raw/`;
+const path = 'exec/raw/';
 
 const executeHandler = async ({ endpoint, rejectUnauthorized, name, file }) => {
     let result;
@@ -12,14 +12,14 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, name, file }) => {
     }
     const body = {
         name, ...result
-    }
+    };
     return post({
         endpoint,
         rejectUnauthorized,
         path,
         body
     });
-}
+};
 
 module.exports = {
     command: 'raw [name]',
@@ -39,4 +39,4 @@ module.exports = {
         const ret = await executeHandler(argv);
         log(ret);
     }
-}
+};

@@ -8,7 +8,7 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, jobId }) => {
         rejectUnauthorized,
         path
     });
-}
+};
 
 module.exports = {
     command: 'status <jobId>',
@@ -21,6 +21,6 @@ module.exports = {
     },
     handler: async (argv) => {
         const ret = await executeHandler(argv);
-        log(ret)
+        log(ret);
     }
-}
+};
