@@ -8,6 +8,7 @@
   },
   "scripts": {
     "lint": "./node_modules/eslint/bin/eslint.js .",
+    "pre-commit": "npm run lint",
     "test": "mocha test --colors --recursive",
     "test-travis": "npm run lint",
     "build-linux": "./scripts/build.sh linux",
@@ -37,6 +38,7 @@
     "form-data": "^3.0.0",
     "fs-extra": "^9.0.1",
     "get-port": "^5.1.1",
+    "get-stdin": "^8.0.0",
     "inquirer": "^7.2.0",
     "js-yaml": "^3.14.0",
     "lodash.merge": "^4.6.2",
@@ -57,7 +59,13 @@
     "eslint-plugin-import": "^2.22.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.1.1",
-    "pkg": "4.3.8"
+    "pkg": "4.3.8",
+    "husky": "^4.2.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run pre-commit"
+    }
   },
   "pkg": {
     "assets": [
