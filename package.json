@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "./node_modules/eslint/bin/eslint.js .",
     "test": "mocha test --colors --recursive",
-    "test-travis": "echo No tests specified",
+    "test-travis": "npm run lint",
     "build-linux": "./scripts/build.sh linux",
     "build-macos": "./scripts/build.sh macos",
     "build-win": "./scripts/build.sh win",
