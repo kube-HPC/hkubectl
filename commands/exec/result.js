@@ -1,4 +1,4 @@
-const prettyjson = require('prettyjson');
+const { log } = require('../../helpers/output');
 const { get } = require('../../helpers/request-helper');
 
 const executeHandler = async ({ endpoint, rejectUnauthorized, jobId }) => {
@@ -24,6 +24,6 @@ module.exports = {
     },
     handler: async (argv) => {
         const ret = await executeHandler(argv);
-        console.log(prettyjson.render(ret));
+        log(ret);
     }
 }

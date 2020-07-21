@@ -1,4 +1,4 @@
-const prettyjson = require('prettyjson');
+const { log } = require('../../../helpers/output');
 const { handleApply } = require('./applyImpl');
 const { askMissingValues } = require('../../../helpers/input');
 const input = require('../../../helpers/input');
@@ -73,7 +73,7 @@ module.exports = {
     handler: async (argv) => {
         const ret = await handleApply(argv);
         if (ret.error) {
-            console.log(prettyjson.render(ret.error));
+            log(ret.error);
         }
     }
 }

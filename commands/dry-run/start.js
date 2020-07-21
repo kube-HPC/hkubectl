@@ -1,5 +1,4 @@
 const path = require('path');
-const prettyjson = require('prettyjson');
 const localPipeline = require('@hkube/local-pipeline-driver');
 const getHandler = async ({ port }) => {
     localPipeline.run(port)

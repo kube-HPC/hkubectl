@@ -1,5 +1,5 @@
 const { del } = require('../../helpers/request-helper');
-const prettyjson = require('prettyjson');
+const { log } = require('../../../helpers/output');
 
 const delHandler = async ({ endpoint, rejectUnauthorized, name }) => {
     const path = `store/algorithms/${name}`
@@ -19,6 +19,6 @@ module.exports = {
     builder: {},
     handler: async (argv) => {
         const ret = await delHandler(argv);
-        console.log(prettyjson.render(ret));
+        log(ret);
     }
 }

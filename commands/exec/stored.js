@@ -1,5 +1,5 @@
 const yaml = require('js-yaml');
-const prettyjson = require('prettyjson');
+const { log } = require('../../helpers/output');
 const fse = require('fs-extra');
 const { post } = require('../../helpers/request-helper');
 const { waitForBuild } = require('../../helpers/results');
@@ -57,6 +57,6 @@ module.exports = {
     },
     handler: async (argv) => {
         const ret = await executeHandler(argv);
-        console.log(prettyjson.render(ret));
+        log(ret);
     }
 }

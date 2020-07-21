@@ -1,4 +1,4 @@
-const prettyjson = require('prettyjson');
+const { log } = require('../../../helpers/output');
 const fse = require('fs-extra');
 const yaml = require('js-yaml');
 var FormData = require('form-data');
@@ -58,6 +58,6 @@ module.exports = {
   },
   handler: async argv => {
     const ret = await handleAdd(argv);
-    console.log(prettyjson.render(ret));
+    log(ret);
   }
 };

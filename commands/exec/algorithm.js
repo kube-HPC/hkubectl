@@ -1,13 +1,13 @@
 const yaml = require('js-yaml');
-const prettyjson = require('prettyjson');
+const { log } = require('../../helpers/output');
 const fse = require('fs-extra');
 const { post } = require('../../helpers/request-helper');
-const {waitForBuild} = require('../../helpers/results');
+const { waitForBuild } = require('../../helpers/results');
 const path = `exec/algorithm/`;
 
 
 
-const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait,noResult }) => {
+const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait, noResult }) => {
     let loadResult;
 
     if (file) {
@@ -28,7 +28,7 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait
     if (noWait) {
         return execResult.result;
     }
-    return waitForBuild({ endpoint, rejectUnauthorized, execResult: execResult.result,noResult })
+    return waitForBuild({ endpoint, rejectUnauthorized, execResult: execResult.result, noResult })
 
 }
 
@@ -58,6 +58,6 @@ module.exports = {
     },
     handler: async (argv) => {
         const ret = await executeHandler(argv);
-        console.log(prettyjson.render(ret));
+        log(ret);
     }
 }

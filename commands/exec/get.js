@@ -1,6 +1,6 @@
 const { get } = require('../../helpers/request-helper');
 const path = require('path');
-const prettyjson = require('prettyjson');
+const { log } = require('../../helpers/output');
 
 const getHandler = async ({ endpoint, rejectUnauthorized, name }) => {
     const path = `store/pipelines/${name ? name : ""}`
@@ -19,6 +19,6 @@ module.exports = {
     builder: {},
     handler: async (argv) => {
         const ret = await getHandler(argv);
-        console.log(prettyjson.render(ret));
+        log(ret);
     }
 }

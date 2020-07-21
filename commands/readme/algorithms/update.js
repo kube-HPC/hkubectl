@@ -1,4 +1,4 @@
-const prettyjson = require('prettyjson');
+const { log } = require('../../../helpers/output');
 const { put, get, putFile } = require('../../helpers/request-helper');
 const merge = require('lodash.merge');
 const fse = require("fs-extra");

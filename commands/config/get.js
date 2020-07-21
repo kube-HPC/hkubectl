@@ -1,4 +1,4 @@
-const prettyjson = require('prettyjson');
+const { log } = require('../../helpers/output');
 const fs = require('fs-extra')
 const { resolveConfigPath } = require('../../helpers/config');
 
@@ -17,6 +17,6 @@ module.exports = {
     builder: {},
     handler: async (argv) => {
         const ret = await handler(argv);
-        console.log(prettyjson.render(ret));
+        log(ret);
     }
 }

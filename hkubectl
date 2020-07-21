@@ -41,6 +41,11 @@ const main = async () => {
     description: 'verbose logging',
     type: "boolean"
   })
+  yargs.options('json', {
+    description: 'output json to stdout',
+    type: "boolean",
+    alias: ['j']
+  })
     .recommendCommands()
     .showHelpOnFail()
     .help()
