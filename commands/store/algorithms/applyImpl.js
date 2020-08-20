@@ -75,14 +75,71 @@ const readFile = (file) => {
 };
 
 const adaptFileData = (fileData) => {
-    const { name, env, image, version, code, resources, algorithmEnv, workerEnv, minHotWorkers, nodeSelector, baseImage, options } = fileData || {};
+    const {
+        name,
+        env,
+        image,
+        algorithmImage,
+        version,
+        code,
+        resources,
+        algorithmEnv,
+        workerEnv,
+        minHotWorkers,
+        nodeSelector,
+        baseImage,
+        options,
+        ...rest
+    } = fileData || {};
     const { cpu, gpu, mem } = resources || {};
-    return { name, env, code: code || {}, version, algorithmImage: image, baseImage, options, cpu, gpu, mem, algorithmEnv, workerEnv, minHotWorkers, nodeSelector };
+    return {
+        name,
+        env,
+        code: code || {},
+        version,
+        algorithmImage: image || algorithmImage,
+        baseImage,
+        options,
+        cpu,
+        gpu,
+        mem,
+        algorithmEnv,
+        workerEnv,
+        minHotWorkers,
+        nodeSelector,
+        ...rest
+    };
 };
 
 const adaptCliData = (cliData) => {
-    const { env, image, ver, cpu, gpu, mem, algorithmEnv, workerEnv, codePath, codeEntryPoint, baseImage, options } = cliData || {};
-    return { env, algorithmImage: image, baseImage, version: ver, cpu, gpu, mem, algorithmEnv, workerEnv, options, code: { path: codePath, entryPoint: codeEntryPoint } };
+    const { env,
+        image,
+        ver,
+        cpu,
+        gpu,
+        mem,
+        algorithmEnv,
+        workerEnv,
+        codePath,
+        codeEntryPoint,
+        baseImage,
+        options,
+        mounts
+    } = cliData || {};
+    return {
+        env,
+        algorithmImage: image,
+        baseImage,
+        version: ver,
+        cpu,
+        gpu,
+        mem,
+        algorithmEnv,
+        workerEnv,
+        options,
+        code: { path: codePath, entryPoint: codeEntryPoint },
+        mounts
+    };
 };
 
 const handleApply = async ({ endpoint, rejectUnauthorized, name, file, noWait, setCurrent, ...cli }) => {
@@ -100,6 +157,7 @@ const handleApply = async ({ endpoint, rejectUnauthorized, name, file, noWait, s
         }
 
         const cliData = adaptCliData(cli);
+
         const algorithmData = merge(fileData, cliData, { name });
         console.log(`Requesting build for algorithm ${algorithmData.name}`);
 

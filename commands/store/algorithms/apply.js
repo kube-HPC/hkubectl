@@ -18,7 +18,6 @@ module.exports = {
                 describe: 'the algorithm env',
                 type: 'string',
                 choices: ['python', 'nodejs', 'java']
-
             },
             codePath: {
                 describe: 'the code path for the algorithm',
@@ -28,6 +27,11 @@ module.exports = {
                 describe: 'the code entry point for the algorithm',
                 type: 'string',
                 alias: ['entryPoint']
+            },
+            image: {
+                describe: 'set algorithm image',
+                type: 'string',
+                alias: ['algorithmImage']
             },
             cpu: {
                 describe: 'CPU requirements of the algorithm in cores',
@@ -53,7 +57,7 @@ module.exports = {
             }
         };
         yargs.middleware((args) => {
-            if (args.file) {
+            if (args.file || !args.codePath) {
                 return null;
             }
             const fillMissing = [
