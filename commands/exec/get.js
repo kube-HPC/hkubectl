@@ -15,7 +15,13 @@ module.exports = {
     description: 'Returns the executed pipeline data',
     options: {
     },
-    builder: {},
+    builder: (yargs) => {
+        yargs.positional('jobId', {
+            demandOption: 'Please provide the job Id',
+            describe: 'The jobId to get the result',
+            type: 'string'
+        });
+    },
     handler: async (argv) => {
         const ret = await getHandler(argv);
         log(ret);

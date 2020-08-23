@@ -17,9 +17,17 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, jobId, reason }) =
 
 module.exports = {
     command: 'stop <jobId> [reason]',
-    alias: ['e'],
     description: 'call to stop pipeline execution',
-    options: {
+    builder: (yargs) => {
+        yargs.positional('jobId', {
+            demandOption: 'Please provide the job Id',
+            describe: 'The jobId to get the result',
+            type: 'string'
+        });
+        yargs.positional('reason', {
+            describe: 'Reason for stopping the pipeline',
+            type: 'string'
+        });
     },
     handler: async (argv) => {
         const ret = await executeHandler(argv);

@@ -12,12 +12,15 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, jobId }) => {
 
 module.exports = {
     command: 'status <jobId>',
-    alias: ['e'],
     description: 'Returns a status for the current pipeline',
     options: {
     },
-    builder: {
-
+    builder: (yargs) => {
+        yargs.positional('jobId', {
+            demandOption: 'Please provide the job Id',
+            describe: 'The jobId to get the result',
+            type: 'string'
+        });
     },
     handler: async (argv) => {
         const ret = await executeHandler(argv);
