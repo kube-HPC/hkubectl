@@ -24,13 +24,18 @@ const handleAdd = async ({ endpoint, rejectUnauthorized, name, readmeFile }) => 
 
 module.exports = {
     command: 'add <name>',
-    description: 'Adds an algorithm',
+    description: 'Adds a Readme to the algorithm',
     options: {},
-    builder: {
-        readmeFile: {
+    builder: (yargs) => {
+        yargs.positional('name', {
+            demandOption: 'Please provide the algorithm name',
+            describe: 'The name of the algorithm',
+            type: 'string'
+        });
+        yargs.options('readmeFile', {
             describe: 'path for readme file. example: --readmeFile="./readme.md',
             type: 'string'
-        }
+        });
     },
     handler: async argv => {
         const ret = await handleAdd(argv);

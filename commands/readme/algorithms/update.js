@@ -24,15 +24,20 @@ const handleUpdate = async (readmeFile, endpoint, rejectUnauthorized, name) => {
 
 module.exports = {
     command: 'update <name>',
-    description: 'update an algorithm',
+    description: 'Updates the Readme of the algorithm',
     options: {
 
     },
-    builder: {
-        readmeFile: {
+    builder: (yargs) => {
+        yargs.positional('name', {
+            demandOption: 'Please provide the algorithm name',
+            describe: 'The name of the algorithm',
+            type: 'string'
+        });
+        yargs.options('readmeFile', {
             describe: 'path for readme file. example: --readmeFile="./readme.md',
             type: 'string'
-        }
+        });
     },
     handler: async (argv) => {
         const ret = await handleUpdate(argv);

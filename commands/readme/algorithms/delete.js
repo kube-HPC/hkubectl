@@ -12,11 +12,14 @@ const delHandler = async ({ endpoint, rejectUnauthorized, name }) => {
 
 module.exports = {
     command: 'delete <name>',
-    description: 'Deletes an algorithm by name',
-    options: {
-
+    description: 'Deletes the readme of an algorithm by name',
+    builder: (yargs) => {
+        yargs.positional('name', {
+            demandOption: 'Please provide the algorithm name',
+            describe: 'The name of the algorithm',
+            type: 'string'
+        });
     },
-    builder: {},
     handler: async (argv) => {
         const ret = await delHandler(argv);
         log(ret);

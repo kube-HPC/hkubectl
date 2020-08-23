@@ -37,6 +37,11 @@ module.exports = {
     description: 'Gets versions of algorithm',
 
     builder: yargs => {
+        yargs.positional('name', {
+            demandOption: 'Please provide the algorithm name',
+            describe: 'The name of the algorithm',
+            type: 'string'
+        });
         const options = {
             setCurrent: {
                 describe: 'Sets the current version',
