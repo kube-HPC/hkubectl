@@ -36,23 +36,30 @@ module.exports = {
     description: 'execute pipeline by name',
     options: {
     },
-    builder: {
-        file: {
-            demandOption: false,
-            describe: 'file path/name for running pipeline',
-            type: 'string',
-            alias: ['f']
-        },
-        noWait: {
-            describe: 'if true, does not wait for the execution to finish',
-            type: 'boolean',
-            default: false,
-        },
-        noResult: {
-            describe: 'if true, does not show the result of the execution',
-            type: 'boolean',
-            default: false,
-        },
+    builder: yargs => {
+        yargs.positional('name', {
+            demandOption: 'Please provide the algorithm name',
+            describe: 'The name of the algorithm',
+            type: 'string'
+        });
+        yargs.options({
+            file: {
+                demandOption: false,
+                describe: 'file path/name for running pipeline',
+                type: 'string',
+                alias: ['f']
+            },
+            noWait: {
+                describe: 'if true, does not wait for the execution to finish',
+                type: 'boolean',
+                default: false,
+            },
+            noResult: {
+                describe: 'if true, does not show the result of the execution',
+                type: 'boolean',
+                default: false,
+            },
+        });
     },
     handler: async (argv) => {
         const ret = await executeHandler(argv);

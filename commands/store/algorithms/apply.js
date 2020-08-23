@@ -8,6 +8,11 @@ module.exports = {
     options: {
     },
     builder: (yargs) => {
+        yargs.positional('name', {
+            demandOption: 'Please provide the algorithm name',
+            describe: 'The name of the algorithm',
+            type: 'string'
+        });
         const options = {
             file: {
                 describe: 'the algorithm file',

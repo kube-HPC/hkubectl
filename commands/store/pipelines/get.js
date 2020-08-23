@@ -15,7 +15,13 @@ module.exports = {
     description: 'Gets an pipeline by name',
     options: {
     },
-    builder: {},
+    builder: yargs => {
+        yargs.positional('name', {
+            demandOption: 'Please provide the algorithm name',
+            describe: 'The name of the algorithm',
+            type: 'string'
+        });
+    },
     handler: async (argv) => {
         const ret = await getHandler(argv);
         log(ret);
