@@ -14,7 +14,8 @@
     "build-linux": "./scripts/build.sh linux",
     "build-macos": "./scripts/build.sh macos",
     "build-win": "./scripts/build.sh win",
-    "build": "npm run build-linux && npm run build-macos && npm run build-win"
+    "build": "npm run build-linux && npm run build-macos && npm run build-win",
+    "gen-docs": "cli-md-docs --path ./hkubectl -o ./README.md --installTemplate \"$(cat ./scripts/installHelper.sh)\""
   },
   "repository": {
     "type": "git",
