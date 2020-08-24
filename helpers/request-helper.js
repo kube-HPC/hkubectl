@@ -24,8 +24,8 @@ const uriBuilder = ({ endpoint, path, qs = {} }) => {
 
 const _request = async ({ endpoint, rejectUnauthorized, path, method, body, formData, qs }) => {
     const url = uriBuilder({ endpoint, path, qs });
-    let result; let
-        error;
+    let result;
+    let error;
     try {
         result = await axios({
             method,
