@@ -6,6 +6,7 @@ const { exec } = require('./builders/exec');
 const algorithms = require('./builders/algorithm');
 const pipelines = require('./builders/pipeline');
 const dryRun = require('./builders/dry-run');
+const localRun = require('./builders/localRun');
 const sync = require('./builders/sync');
 const syncthing = require('./helpers/syncthing/syncthing.js');
 
@@ -25,6 +26,7 @@ const main = async () => {
     yargs.command(algorithms);
     yargs.command(pipelines);
     yargs.command(dryRun);
+    yargs.command(localRun);
     yargs.command(sync);
     yargs.command(config);
     yargs.options('rejectUnauthorized', {
