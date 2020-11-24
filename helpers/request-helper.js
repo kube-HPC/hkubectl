@@ -9,10 +9,10 @@ const sleep = promisify(setTimeout);
 
 const apiPrefix = 'api/v1/';
 
-const uriBuilder = ({ endpoint, path, qs = {} }) => {
+const uriBuilder = ({ endpoint, path, qs = {}, usePrefix = true }) => {
     let prefix = apiPrefix;
     const { pathPrefix } = yargs.argv;
-    prefix = pathLib.join(pathPrefix, prefix);
+    prefix = usePrefix ? pathLib.join(pathPrefix, prefix) : '';
     const fullPath = pathLib.join(prefix, path);
     const url = new URL(fullPath, endpoint);
     Object.entries(qs).forEach(([k, v]) => {
@@ -90,5 +90,6 @@ module.exports = {
     put,
     putFile,
     del,
-    getUntil
+    getUntil,
+    uriBuilder
 };

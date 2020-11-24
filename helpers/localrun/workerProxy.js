@@ -1,7 +1,6 @@
 const WebSocket = require('ws');
 const { once } = require('events');
 const { log } = require('../output');
-const messages = require('./messages');
 
 class WorkerProxy {
     constructor({ name, socket, debugUrl }) {
@@ -11,28 +10,32 @@ class WorkerProxy {
     }
 
     _register(algorithmSocket, debugSocket) {
-        Object.entries({ ...messages.incoming }).forEach(([, topic]) => {
-            log.debug(`registering for topic ${topic}`);
-            algorithmSocket.on(topic, (message) => {
-                debugSocket.send(message);
-            });
+        algorithmSocket.on('message', (message) => {
+            debugSocket.send(message);
         });
-        Object.entries({ ...messages.outgoing }).forEach(([, topic]) => {
-            log.debug(`registering for topic ${topic}`);
-            debugSocket.on(topic, (message) => {
-                algorithmSocket.send(message);
-            });
+        debugSocket.on('message', (message) => {
+            algorithmSocket.send(message);
         });
     }
 
     async start() {
         this._debugWs = new WebSocket(this._debugUrl);
         await once(this._debugWs, 'open');
-        this._register(this._socket);
+        this._register(this._socket, this._debugWs);
         log.info(`proxy for ${this.algorithmName} started`);
     }
 
     stop() {
+        if (this._socket) {
+            this._socket.removeAllListeners('message');
+            this._socket.removeAllListeners('close');
+            this._socket = null;
+        }
+        if (this._debugWs) {
+            this._debugWs.removeAllListeners('message');
+            this._debugWs.removeAllListeners('close');
+            this._debugWs = null;
+        }
         log.info(`proxy for ${this.algorithmName} stopped`);
     }
 }

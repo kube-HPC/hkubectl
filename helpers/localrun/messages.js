@@ -1,5 +1,5 @@
 module.exports = {
-    incomming: {
+    incoming: {
         initialized: 'initialized',
         started: 'started',
         stopped: 'stopped',

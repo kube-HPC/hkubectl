@@ -1,7 +1,7 @@
 const WsWorkerCommunication = require('./wsserver');
 const WorkerProxy = require('./workerProxy');
 const { log } = require('../output');
-const { get, post } = require('../request-helper');
+const { get, post, uriBuilder } = require('../request-helper');
 class LocalRunner {
     constructor() {
         this._wss = null;
@@ -18,6 +18,14 @@ class LocalRunner {
 
     _register() {
         this._wss.on('connection', this._onConnection.bind(this));
+        this._wss.on('disconnect', this._onDisconnec.bind(this));
+    }
+
+    async _onDisconnec({ name }) {
+        if (this._registeredAlgorithms[name]) {
+            this._registeredAlgorithms[name].stop();
+            delete this._registeredAlgorithms[name];
+        }
     }
 
     async _onConnection({ query, socket }) {
@@ -38,7 +46,7 @@ class LocalRunner {
         this._registeredAlgorithms[query.name] = new WorkerProxy({
             ...query,
             socket,
-            debugUrl: algorithm.result.data.path
+            debugUrl: uriBuilder({ ...this._options, path: algorithm.result.data.path, qs: query, usePrefix: false })
         });
         this._registeredAlgorithms[query.name].start();
         log.info(`algorithm ${query.name} registered`);
