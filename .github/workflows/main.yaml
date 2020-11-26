@@ -1,11 +1,11 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI-PR
+name: CI-MAIN
 
 # Controls when the action will run. 
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
-  pull_request:
+  push:
     branches: [ master ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -23,5 +23,52 @@ jobs:
         with:
           node-version: 10.x
       - run: npm ci
+      - run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
       - run: NODE_ENV=test npm run-script test-travis
-      
+      - run: |
+          npm version patch -m "$(git log -1 --pretty=%B) .... bump version"
+          echo TAG=$(git describe --abbrev=0) >> $GITHUB_ENV
+      - run: git push --follow-tags
+      - run: npm run build
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.TAG }}
+          release_name: Release ${{ env.TAG }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset Linux
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./output/hkubectl-linux
+          asset_name: hkubectl-linux
+          asset_content_type: octet-stream
+      - name: Upload Release Asset Mac
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./output/hkubectl-macos
+          asset_name: hkubectl-macos
+          asset_content_type: octet-stream
+      - name: Upload Release Asset Windows
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./output/hkubectl-win.exe
+          asset_name: hkubectl-win.exe
+          asset_content_type: octet-stream
