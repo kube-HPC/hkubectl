@@ -7,7 +7,7 @@ const FormData = require('form-data');
 const ora = require('ora');
 const expandTilde = require('expand-tilde');
 
-const { postFile, getUntil, post } = require('../../../helpers/request-helper');
+const { postFile, getUntil, post, get } = require('../../../helpers/request-helper');
 const { zipDirectory } = require('../../../helpers/zipper');
 const { buildDoneEvents } = require('../../../helpers/consts');
 
@@ -34,7 +34,16 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, name, setCurrent, ap
             return (Object.values(buildDoneEvents).includes(res.result.status));
         }, 1000 * 60 * 10);
         const { algorithmImage, version, semver, status } = buildResult.result;
-        const newVersion = version || semver;
+        let newVersion = version || semver;
+        let versionId = null;
+        if (!newVersion) {
+            const allVersions = await get({ endpoint, rejectUnauthorized, path: `versions/algorithms/${name}` });
+            const foundVersion = allVersions.result.find(v => v.buildId === buildId);
+            if (foundVersion) {
+                newVersion = foundVersion.semver;
+                versionId = foundVersion.version;
+            }
+        }
         if (status === buildDoneEvents.completed) {
             spinner.succeed();
             if (setCurrent) {
@@ -46,6 +55,7 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, name, setCurrent, ap
                     body: {
                         name,
                         image: algorithmImage,
+                        version: versionId,
                         force: true
                     }
                 });
