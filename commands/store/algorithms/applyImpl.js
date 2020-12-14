@@ -33,11 +33,12 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, name, setCurrent, ap
             lastStatus = res.result.status;
             return (Object.values(buildDoneEvents).includes(res.result.status));
         }, 1000 * 60 * 10);
-        const { algorithmImage, version, status } = buildResult.result;
+        const { algorithmImage, version, semver, status } = buildResult.result;
+        const newVersion = version || semver;
         if (status === buildDoneEvents.completed) {
             spinner.succeed();
             if (setCurrent) {
-                console.log(`Setting version ${version} as current`);
+                console.log(`Setting version ${newVersion} as current`);
                 await post({
                     endpoint,
                     rejectUnauthorized,
@@ -50,7 +51,7 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, name, setCurrent, ap
                 });
             }
             else {
-                console.log(`New version ${version} created. Set it as current from the dashboard`);
+                console.log(`New version ${newVersion} created. Set it as current from the dashboard`);
             }
         }
         else {
