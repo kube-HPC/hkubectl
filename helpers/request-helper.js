@@ -11,7 +11,7 @@ const apiPrefix = 'api/v1/';
 const uriBuilder = ({ endpoint, path, qs = {}, usePrefix = true }) => {
     let prefix = apiPrefix;
     const { pathPrefix } = global.args || {};
-    prefix = pathLib.join(pathPrefix, prefix);
+    prefix = usePrefix ? pathLib.join(pathPrefix, prefix) : '';
     const fullPath = pathLib.join(prefix, path);
     const url = new URL(fullPath, endpoint);
     Object.entries(qs).forEach(([k, v]) => {
