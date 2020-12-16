@@ -3,7 +3,6 @@ const axios = require('axios').default;
 const https = require('https');
 const { URL } = require('url');
 const { promisify } = require('util');
-const yargs = require('yargs');
 const { getError } = require('./error-helper');
 const sleep = promisify(setTimeout);
 
@@ -11,8 +10,8 @@ const apiPrefix = 'api/v1/';
 
 const uriBuilder = ({ endpoint, path, qs = {}, usePrefix = true }) => {
     let prefix = apiPrefix;
-    const { pathPrefix } = yargs.argv;
-    prefix = usePrefix ? pathLib.join(pathPrefix, prefix) : '';
+    const { pathPrefix } = global.args || {};
+    prefix = pathLib.join(pathPrefix, prefix);
     const fullPath = pathLib.join(prefix, path);
     const url = new URL(fullPath, endpoint);
     Object.entries(qs).forEach(([k, v]) => {
