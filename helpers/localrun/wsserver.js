@@ -16,7 +16,6 @@ class WsWorkerCommunication extends EventEmitter {
 
         this._socketServer.on('connection', (socket, opt) => {
             const { query } = url.parse(opt.url, true);
-            log.info('Connected!!!');
             this._registerSocketMessages(socket, query);
             this.emit('connection', { query, socket });
         });
@@ -24,7 +23,7 @@ class WsWorkerCommunication extends EventEmitter {
             log.error(`error ${error}`);
         });
         this._socketServer.on('listening', () => {
-            log.info('listening');
+            log.info(`WebSocket server listening on port ${options.port}`);
         });
     }
 

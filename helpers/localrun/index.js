@@ -30,7 +30,11 @@ class LocalRunner {
 
     async _onConnection({ query, socket }) {
         // verify that there is a debug algorithm
-        let algorithm = await get({ ...this._options, path: `/store/algorithms/${query.name}` });
+        let algorithm = await get({ ...this._options, path: `/store/algorithms/${query.name}`, timeout: 5000 });
+        if (algorithm.timeoutError) {
+            log.error('Unable to verify debug algorithm', algorithm.error);
+            return;
+        }
         if (!algorithm.result) {
             log.info('creating algorithm in cluster');
             algorithm = await post({ ...this._options, path: '/store/algorithms/debug', body: { name: query.name } });
@@ -46,7 +50,7 @@ class LocalRunner {
         this._registeredAlgorithms[query.name] = new WorkerProxy({
             ...query,
             socket,
-            debugUrl: uriBuilder({ ...this._options, path: algorithm.result.data.path, qs: query, usePrefix: false })
+            debugUrl: uriBuilder({ ...this._options, path: algorithm.result.data.path, qs: query, usePrefix: false, schema: 'ws://' })
         });
         this._registeredAlgorithms[query.name].start();
         log.info(`algorithm ${query.name} registered`);
