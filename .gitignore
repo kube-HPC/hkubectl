@@ -69,3 +69,4 @@ hkubectl-*
 helpers/syncthing/syncthing
 output
 testers
+!tests/testData/**
