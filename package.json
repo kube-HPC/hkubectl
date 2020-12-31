@@ -9,7 +9,7 @@
   "scripts": {
     "lint": "./node_modules/eslint/bin/eslint.js .",
     "pre-commit": "npm run lint",
-    "test": "mocha test --colors --recursive",
+    "test": "mocha tests --colors --recursive",
     "test-travis": "npm run lint",
     "build-linux": "./scripts/build.sh linux",
     "build-macos": "./scripts/build.sh macos",
@@ -56,14 +56,15 @@
     "yargs": "^16.1.1"
   },
   "devDependencies": {
+    "adm-zip": "^0.5.1",
     "chai": "^4.1.2",
     "eslint": "^7.5.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
+    "husky": "^4.2.5",
     "istanbul": "^0.4.5",
     "mocha": "^5.1.1",
-    "pkg": "4.3.8",
-    "husky": "^4.2.5"
+    "pkg": "4.3.8"
   },
   "husky": {
     "hooks": {
