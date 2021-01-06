@@ -16,6 +16,11 @@ const _generateSampleAlgorithm = ({ env, ...rest }) => {
     const { algorithm } = templates[env];
     return algorithm({ env, ...rest });
 };
+
+const _generateIgnoreFile = ({ env, ...rest }) => {
+    const { ignore } = templates[env];
+    return ignore({ env, ...rest });
+};
 const template = async ({ name, codePath, codeEntryPoint, overwrite, env, ...rest }) => {
     const fullPath = path.resolve(codePath);
     const exist = await fs.pathExists(fullPath);
@@ -23,15 +28,22 @@ const template = async ({ name, codePath, codeEntryPoint, overwrite, env, ...res
         return `${chalk.red('Error')}: Path ${fullPath} exists. Set the --overwrite option to overwrite`;
     }
     await fs.ensureDir(fullPath);
+    if (!name) {
+        // eslint-disable-next-line no-param-reassign
+        name = path.basename(codePath);
+    }
     const algorithm = _generateSampleAlgorithm({ name, env });
     const entryFile = replaceExt(codeEntryPoint, extensions[env]);
-
+    const definitionFile = replaceExt(entryFile, '.yaml');
     const definition = _generateDefinitionFile({ name, env, ...rest, entryFile });
+    const ignore = _generateIgnoreFile({ name, env, ...rest, definitionFile });
 
     const algorithmFileName = path.join(fullPath, entryFile);
     await fs.writeFile(algorithmFileName, algorithm);
-    const definitionFileName = path.join(fullPath, replaceExt(entryFile, '.yaml'));
+    const definitionFileName = path.join(fullPath, definitionFile);
     await fs.writeFile(definitionFileName, definition);
+    const ignoreFileName = path.join(fullPath, '.hkubeignore');
+    await fs.writeFile(ignoreFileName, ignore);
     return `
 Algorithm ${chalk.bold(name)} was created in ${chalk.bold(codePath)}
 To Build:

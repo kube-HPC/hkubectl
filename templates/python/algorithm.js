@@ -1,5 +1,4 @@
-const algorithm = (args) => `
-def start(args, hkubeApi):
+const algorithm = (args) => `def start(args, hkubeApi):
   # example ${args.name} algorithm
   # input is an array of algorithm input
   input=args.get('input')

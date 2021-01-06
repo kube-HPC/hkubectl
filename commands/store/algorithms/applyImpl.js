@@ -154,8 +154,9 @@ const adaptCliData = (cliData) => {
 };
 
 const handleApply = async ({ endpoint, rejectUnauthorized, name, file, noWait, setCurrent, ...cli }) => {
-    let result; let
-        error;
+    let result;
+    let error;
+    const spinner = ora({ text: 'Build starting', spinner: 'line' }).start();
     try {
         let stream; let
             fileData;
@@ -170,10 +171,8 @@ const handleApply = async ({ endpoint, rejectUnauthorized, name, file, noWait, s
         const cliData = adaptCliData(cli);
 
         const algorithmData = merge(fileData, cliData, { name });
-        console.log(`Requesting build for algorithm ${algorithmData.name}`);
-
         const { code, ...algorithm } = algorithmData;
-
+        spinner.text = `Requesting build for algorithm ${algorithmData.name}`;
         const body = {
             ...algorithm,
             entryPoint: code.entryPoint,
@@ -200,13 +199,12 @@ const handleApply = async ({ endpoint, rejectUnauthorized, name, file, noWait, s
             const stats = await fse.stat(codePath);
             if (stats.isDirectory()) {
                 // create zip file
-                console.log(`Creating zip of ${codePath}`);
-                const zipFileName = await zipDirectory(codePath, { tmpFile: true });
+                const zipFileName = await zipDirectory(codePath, { tmpFile: true, spinner });
                 codePath = zipFileName;
             }
             stream = fse.createReadStream(codePath);
         }
-
+        spinner.text = 'Uploading algorithm data';
         const formData = new FormData();
         formData.append('payload', JSON.stringify(body));
         formData.append('file', stream || '');
@@ -217,6 +215,7 @@ const handleApply = async ({ endpoint, rejectUnauthorized, name, file, noWait, s
             formData,
             path: applyPath
         });
+        spinner.succeed();
         if (result.result) {
             console.log(result.result.messages.join('\n'));
             if (!noWait) {
@@ -226,6 +225,7 @@ const handleApply = async ({ endpoint, rejectUnauthorized, name, file, noWait, s
     }
     catch (e) {
         error = e.message;
+        spinner.fail();
     }
     return {
         error: error || result.error, result
