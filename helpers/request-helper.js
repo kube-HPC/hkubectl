@@ -8,12 +8,15 @@ const sleep = promisify(setTimeout);
 
 const apiPrefix = 'api/v1/';
 
-const uriBuilder = ({ endpoint, path, qs = {} }) => {
+const uriBuilder = ({ endpoint, path, qs = {}, usePrefix = true, schema }) => {
     let prefix = apiPrefix;
     const { pathPrefix } = global.args || {};
-    prefix = pathLib.join(pathPrefix, prefix);
+    prefix = usePrefix ? pathLib.join(pathPrefix, prefix) : '';
     const fullPath = pathLib.join(prefix, path);
     const url = new URL(fullPath, endpoint);
+    if (schema) {
+        url.protocol = schema;
+    }
     Object.entries(qs).forEach(([k, v]) => {
         url.searchParams.append(k, v);
     });
@@ -22,9 +25,19 @@ const uriBuilder = ({ endpoint, path, qs = {} }) => {
 
 const _request = async ({ endpoint, rejectUnauthorized, path, method, body, formData, qs, timeout }) => {
     const url = uriBuilder({ endpoint, path, qs });
-    let result;
+    let result = null;
     let error;
+    let timeoutError = false;
     try {
+        const source = axios.CancelToken.source();
+        if (timeout) {
+            setTimeout(() => {
+                if (!result && !error) {
+                    source.cancel(`request to ${url} timed out`);
+                }
+            }, timeout);
+        }
+
         result = await axios({
             method,
             url,
@@ -32,13 +45,16 @@ const _request = async ({ endpoint, rejectUnauthorized, path, method, body, form
             json: true,
             data: body || formData,
             headers: formData ? formData.getHeaders() : {},
-            timeout
+            cancelToken: source.token
         });
     }
     catch (e) {
+        if (e instanceof axios.Cancel) {
+            timeoutError = true;
+        }
         error = getError(e);
     }
-    return { error, result: result && result.data };
+    return { timeoutError, error, result: result && result.data };
 };
 
 const del = async ({ endpoint, rejectUnauthorized, path, qs }) => {
@@ -89,5 +105,6 @@ module.exports = {
     put,
     putFile,
     del,
-    getUntil
+    getUntil,
+    uriBuilder
 };

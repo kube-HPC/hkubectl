@@ -10,9 +10,8 @@ const { configFolder } = require('../config');
 const { directions } = require('../consts');
 const Api = require('./api');
 const { lock } = require('../locks');
-
+const { delay } = require('../utils');
 const pipeline = promisify(stream.pipeline);
-const delay = promisify(setTimeout);
 class Syncthing extends EventEmitter {
     _init({ algorithmName }) {
         this._configDir = pathLib.join(configFolder(), algorithmName, 'syncthing');

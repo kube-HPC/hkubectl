@@ -16,6 +16,14 @@ const log = (data, { json, printOptions } = {}) => {
         console.log(prettyjson.render(data, printOptions));
     }
 };
+
+const simpleLog = (message) => {
+    log(message, { json: false });
+};
+
+log.warning = simpleLog;
+log.info = simpleLog;
+log.error = (message, error) => simpleLog(`${message}. Error: ${(error && error.message) ? error.message : error}`);
 module.exports = {
     log
 };
