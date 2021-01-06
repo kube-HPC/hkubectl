@@ -52,8 +52,19 @@ class LocalRunner {
             socket,
             debugUrl: uriBuilder({ ...this._options, path: algorithm.result.data.path, qs: query, usePrefix: false, schema: 'ws://' })
         });
-        this._registeredAlgorithms[query.name].start();
+        await this._registeredAlgorithms[query.name].start();
         log.info(`algorithm ${query.name} registered`);
+        if (query.exec) {
+            log.info(`Starting algorithm execution for ${query.name}`);
+            const execResult = await post({ ...this._options, path: '/exec/algorithm', body: { name: query.name } });
+            const ok = !!execResult.result;
+            if (ok) {
+                log.info(`Execution jobId: ${execResult.result.jobId}`);
+            }
+            else {
+                log.warning(`Execution failed with error ${execResult.error}`);
+            }
+        }
     }
 }
 
