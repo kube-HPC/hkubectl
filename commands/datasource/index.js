@@ -1,19 +1,20 @@
-const fse = require('fs-extra');
 const { parse } = require('path');
 const formatSize = require('pretty-bytes');
 const Repository = require('../../helpers/dataSource/Repository');
 const { api: client } = require('../../helpers/clients');
 const { log } = require('../../helpers/output');
 
-/** @returns {Promise<{repositoryName: string}>} */
-const readHkubeFile = async (cwd) => {
-    const hkubeFilePath = `${cwd}/.dvc/hkube`;
-    const hasHkubeFile = await fse.pathExists(hkubeFilePath);
-    if (!hasHkubeFile) {
-        throw new Error('missing hkube file in .dvc directory');
-    }
-    const stringifiedHkubeFile = await fse.readFile(hkubeFilePath);
-    return JSON.parse(stringifiedHkubeFile.toString('utf-8'));
+const handleSync = async () => {
+    const cwd = process.cwd();
+    const hkubeFile = await Repository.readHkubeFile(cwd);
+    const response = await client.post(`datasource/${hkubeFile.repositoryName}/sync`);
+    const { avgFileSize, totalSize } = response.data;
+    log({
+        ...response.data,
+        avgFileSize: formatSize(avgFileSize),
+        totalSize: formatSize(totalSize)
+    });
+    return null;
 };
 
 const push = {
@@ -23,13 +24,11 @@ const push = {
     builder: {},
     handler: async () => {
         const cwd = process.cwd();
-        const hkubeFile = await readHkubeFile(cwd);
+        const hkubeFile = await Repository.readHkubeFile(cwd);
         const { dir } = parse(cwd);
         const repo = new Repository(hkubeFile.repositoryName, dir);
         await repo.push();
-        const response = await client.post(`datasource/${hkubeFile.repositoryName}/sync`);
-        log(response.data);
-        return null;
+        return handleSync();
     }
 };
 
@@ -38,18 +37,7 @@ const sync = {
     description: 'should be called after push updates to git, creates a new version entry on the datasource service',
     options: {},
     builder: {},
-    handler: async () => {
-        const cwd = process.cwd();
-        const hkubeFile = await readHkubeFile(cwd);
-        const response = await client.post(`datasource/${hkubeFile.repositoryName}/sync`);
-        const { avgFileSize, totalSize } = response.data;
-        log({
-            ...response.data,
-            avgFileSize: formatSize(avgFileSize),
-            totalSize: formatSize(totalSize)
-        });
-        return null;
-    }
+    handler: handleSync
 };
 
 const prepare = {
@@ -60,10 +48,10 @@ const prepare = {
     handler: async () => {
         const cwd = process.cwd();
         const { dir } = parse(cwd);
-        const hkubeFile = await readHkubeFile(cwd);
+        const hkubeFile = await Repository.readHkubeFile(cwd);
         const repo = new Repository(hkubeFile.repositoryName, dir);
         await repo.prepareDvcFiles();
-        return 0;
+        return null;
     }
 };
 
