@@ -8,6 +8,7 @@ const pipelines = require('./builders/pipeline');
 const dryRun = require('./builders/dry-run');
 const sync = require('./builders/sync');
 const { dataSource } = require('./builders/dataSource');
+const { setupClient } = require('./helpers/clients');
 const syncthing = require('./helpers/syncthing/syncthing.js');
 
 global.args = {};
@@ -23,13 +24,7 @@ const main = async () => {
     const configFile = await readConfig();
 
     yargs.config(configFile);
-    yargs.command(exec);
-    yargs.command(algorithms);
-    yargs.command(pipelines);
-    yargs.command(dryRun);
-    yargs.command(sync);
-    yargs.command(config);
-    yargs.command(dataSource);
+
     yargs.options('rejectUnauthorized', {
         description: 'set to false to ignore certificate signing errors. Useful for self signed TLS certificate',
         type: 'boolean'
@@ -57,6 +52,15 @@ const main = async () => {
         .help()
         .epilog(chalk.bold('for more information visit http://hkube.io'))
         .completion();
+
+    setupClient(yargs.config().argv);
+    yargs.command(exec);
+    yargs.command(algorithms);
+    yargs.command(pipelines);
+    yargs.command(dryRun);
+    yargs.command(sync);
+    yargs.command(config);
+    yargs.command(dataSource);
     yargs.middleware((args) => {
         global.args = args;
     });

@@ -51,6 +51,7 @@
     "mime-types": "^2.1.28",
     "object-path": "^0.11.4",
     "ora": "^4.0.4",
+    "pretty-bytes": "^5.5.0",
     "prettyjson": "^1.2.1",
     "proper-lockfile": "^4.1.1",
     "pump": "^3.0.0",
