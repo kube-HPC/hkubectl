@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/kube-HPC/hkubectl#readme",
   "dependencies": {
-    "@hkube/datasource-utils": "^1.0.0",
+    "@hkube/datasource-utils": "^1.0.2",
     "@hkube/local-pipeline-driver": "^1.0.4",
     "@hkube/uid": "^1.0.4",
     "archiver": "^4.0.1",

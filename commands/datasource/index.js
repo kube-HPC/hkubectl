@@ -47,9 +47,9 @@ const prepare = {
     builder: {},
     handler: async () => {
         const cwd = process.cwd();
-        const { dir } = parse(cwd);
+        const { dir, name } = parse(cwd);
         const hkubeFile = await Repository.readHkubeFile(cwd);
-        const repo = new Repository(hkubeFile.repositoryName, dir);
+        const repo = new Repository(hkubeFile.repositoryName, dir, name);
         await repo.prepareDvcFiles();
         return null;
     }

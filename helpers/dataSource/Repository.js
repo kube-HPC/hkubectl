@@ -11,8 +11,9 @@ class Repository extends _Repository {
      * @param {string} repositoryName
      * @param {string} rootDir
      */
-    constructor(repositoryName, rootDir) {
-        super(repositoryName, rootDir);
+    constructor(repositoryName, rootDir, dirName) {
+        super(repositoryName, rootDir, dirName);
+        this.dirName = dirName || repositoryName;
         this.gitClient = simpleGit({ baseDir: this.cwd });
     }
 
