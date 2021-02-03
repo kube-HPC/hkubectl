@@ -2,7 +2,7 @@
   
 ## Install  
 ```shell  
-curl -Lo hkubectl https://github.com/kube-HPC/hkubectl/releases/download/$(curl -s https://api.github.com/repos/kube-HPC/hkubectl/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')/hkubectl-linux \
+curl -Lo hkubectl https://github.com/kube-HPC/hkubectl/releases/latest/download/hkubectl-linux \
 && chmod +x hkubectl \
 && sudo mv hkubectl /usr/local/bin/  
 ```  
@@ -21,8 +21,9 @@ Options:
 |--version|Show version number|boolean|||  
 |--rejectUnauthorized|set to false to ignore certificate signing errors. Useful for self signed TLS certificate|boolean|||  
 |--endpoint|url of hkube api endpoint|string|||  
+|--pathPrefix|path prefix url of hkube api endpoint  |string||/hkube/api-server/|  
 |--verbose|verbose logging|boolean|||  
-|--json, -j|output json to stdout|boolean|||  
+|-j, --json|output json to stdout|boolean|||  
 |--help|Show help|boolean|||  
 ### exec  
 ---  
@@ -53,7 +54,7 @@ Options:
   
 |option|description|type|required|default|  
 |---|---|---|---|---|  
-|--file, -f|file path/name for running pipeline. use - to read from stdin|string|true||  
+|-f, --file|file path/name for running pipeline. use - to read from stdin|string|true||  
 |--noWait|if true, does not wait for the execution to finish  |boolean||false|  
 |--noResult|if true, does not show the result of the execution  |boolean||false|  
 #### stored  
@@ -68,7 +69,7 @@ Options:
 |option|description|type|required|default|  
 |---|---|---|---|---|  
 |name|The name of the algorithm|string|||  
-|--file, -f|file path/name for running pipeline|string|||  
+|-f, --file|file path/name for running pipeline|string|||  
 |--noWait|if true, does not wait for the execution to finish  |boolean||false|  
 |--noResult|if true, does not show the result of the execution  |boolean||false|  
 #### stop  
@@ -120,7 +121,7 @@ Options:
 |option|description|type|required|default|  
 |---|---|---|---|---|  
 |name|The name of the algorithm|string|||  
-|--file, -f|file path/name for extra data|string|||  
+|-f, --file|file path/name for extra data|string|||  
 |--noWait|if true, does not wait for the execution to finish  |boolean||false|  
 |--noResult|if true, does not show the result of the execution  |boolean||false|  
 ### algorithm  
@@ -141,16 +142,16 @@ Options:
 |option|description|type|required|default|  
 |---|---|---|---|---|  
 |name|The name of the algorithm|string|||  
-|--file, -f|the algorithm file|string|||  
+|-f, --file|the algorithm file|string|||  
 |--env|the algorithm env  [choices: "python", "nodejs", "java"]|string|||  
 |--codePath|the code path for the algorithm|string|||  
-|--codeEntryPoint, --entryPoint|the code entry point for the algorithm|string|||  
+|--codeEntryPoint, --entryPoint|the code entry point for the algorithm |string|||  
 |--image, --algorithmImage|set algorithm image|string|||  
 |--cpu|CPU requirements of the algorithm in cores |number|||  
 |--gpu|GPU requirements of the algorithm in cores |number|||  
-|--mem|memory requirements of the algorithm. Possible units are ['Ki', 'M', 'Mi', 'Gi', 'm', 'K', 'G', 'T', 'Ti', 'P', 'Pi', 'E', 'Ei']. Minimum is 4Mi|string|||  
-|--noWait|if true, does not wait for the build to finish  |boolean||false|  
-|--setCurrent|if true, sets the new version as the current version|boolean||false|  
+|--mem|memory requirements of the algorithm. Possible units are ['Mi', 'Gi']. Minimum is 4Mi|string|||  
+|--noWait|if true, does not wait for the build to finish|boolean||false|  
+|--setCurrent|if true, sets the new version as the current version  |boolean||false|  
 #### list  
   
 ```shell  
@@ -213,7 +214,7 @@ Options:
 |--overwrite|overwrite an existing folder|boolean|||  
 |--cpu|CPU requirements of the algorithm in cores  |number||0.1|  
 |--gpu|GPU requirements of the algorithm in cores  |number||0|  
-|--mem|memory requirements of the algorithm. Possible units are ['Ki', 'M', 'Mi', 'Gi', 'm', 'K', 'G', 'T', 'Ti', 'P', 'Pi', 'E', 'Ei']. Minimum is 4Mi|string||512Mi|  
+|--mem|memory requirements of the algorithm. Possible units are ['Ki', 'M', 'Mi', 'Gi', 'm', 'K', 'G', 'T', 'Ti', 'P', 'Pi', 'E', 'Ei']. Minimum is 4Mi  |string||512Mi|  
 ### pipeline  
 ---  
 ```shell  
@@ -243,8 +244,8 @@ Options:
   
 |option|description|type|required|default|  
 |---|---|---|---|---|  
-|--file, -f|path for descriptor file|string|true||  
-|--readmeFile|path for readme file. example: --readmeFile="./readme.md |string|||  
+|-f, --file|path for descriptor file|string|true||  
+|--readmeFile|path for readme file. example: --readmeFile="./readme.md|string|||  
 ### sync  
 ---  
 ```shell  
@@ -262,9 +263,9 @@ Options:
   
 |option|description|type|required|default|  
 |---|---|---|---|---|  
-|--algorithmName, -a|The name of the algorithm to sync data into  [required]|string|true||  
-|--folder, -f|local folder to sync.|string||./|  
-|--bidirectional, --bidi|Sync files in both ways|boolean||false|  
+|-a, --algorithmName|The name of the algorithm to sync data into  [required]|string|true||  
+|-f, --folder|local folder to sync.|string||./|  
+|--bidirectional, --bidi|Sync files in both ways |boolean||false|  
 #### create  
   
 ```shell  
@@ -276,10 +277,10 @@ Options:
   
 |option|description|type|required|default|  
 |---|---|---|---|---|  
-|--algorithmName, -a|The name of the algorithm|string|true||  
-|--folder, -f|local folder to build from.|string||./|  
+|-a, --algorithmName|The name of the algorithm|string|true||  
+|-f, --folder|local folder to build from.  |string||./|  
 |--env|algorithm runtime environment  [choices: "python", "nodejs"]|string|||  
-|--entryPoint, -e|the main file of the algorithm|string|||  
+|-e, --entryPoint|the main file of the algorithm|string|||  
 |--baseImage|base image for the algorithm|string|||  
 ### config  
 ---  
@@ -298,4 +299,30 @@ Sets configuration options.
 ```shell  
 $ hkubectl config get   
 ```  
-Gets the current configuration.  
+Gets the current configuration.    
+### datasource  
+---  
+```shell  
+$ hkubectl datasource < command >  
+```  
+Execution pipelines as raw or stored    
+#### sync  
+  
+```shell  
+$ hkubectl datasource sync   
+```  
+should be called after push updates to git, creates a new version entry on the
+datasource service    
+#### prepare  
+  
+```shell  
+$ hkubectl datasource prepare   
+```  
+should be called before commiting to git, scans the directory and updates all
+the.dvc files    
+#### push  
+  
+```shell  
+$ hkubectl datasource push   
+```  
+calls dvc, git push and hkube datasource hkube datasource prepare and sync  
