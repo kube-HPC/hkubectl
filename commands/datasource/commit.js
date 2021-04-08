@@ -16,7 +16,7 @@ const commit = {
     builder: {},
     handler: async ({ m: message }) => {
         const cwd = process.cwd();
-        const hkubeFile = await Repository.readHkubeFile(cwd);
+        const hkubeFile = await Repository.readHkubeFile();
         const { dir, name } = parse(cwd);
         const repo = new Repository(hkubeFile.repositoryName, dir, name);
         await repo.prepareDvcFiles();

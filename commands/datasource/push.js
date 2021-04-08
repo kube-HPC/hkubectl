@@ -9,9 +9,9 @@ const push = {
     builder: {},
     handler: async () => {
         const cwd = process.cwd();
-        const hkubeFile = await Repository.readHkubeFile(cwd);
-        const { dir } = parse(cwd);
-        const repo = new Repository(hkubeFile.repositoryName, dir);
+        const hkubeFile = await Repository.readHkubeFile();
+        const { dir, name } = parse(cwd);
+        const repo = new Repository(hkubeFile.repositoryName, dir, name);
         await repo.push();
         return handleSync();
     }
