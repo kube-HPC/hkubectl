@@ -1,3 +1,4 @@
+require('./polyfills');
 const yargs = require('yargs');
 const chalk = require('chalk');
 const { readConfig } = require('./helpers/config');
