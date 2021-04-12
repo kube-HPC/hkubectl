@@ -3,6 +3,7 @@ const { Repository: _Repository, createFileMeta, glob } = require('@hkube/dataso
 const fse = require('fs-extra');
 const get = require('lodash.get');
 const { default: simpleGit } = require('simple-git');
+const { cosmiconfigSync } = require('cosmiconfig');
 /**
  * @typedef {import('@hkube/datasource-utils').LocalFileMeta} LocalFileMeta
  */
@@ -25,6 +26,14 @@ class Repository extends _Repository {
             size,
             mimetype
         }, null, 'cli');
+    }
+
+    static async readHkubeFile() {
+        const searchResults = cosmiconfigSync('hkube', { searchPlaces: ['.dvc/hkube'] }).search();
+        if (searchResults && searchResults.config) {
+            return searchResults.config;
+        }
+        throw new Error('missing hkube file, you must be inside an hkube Datasource directory');
     }
 
     async prepareDvcFiles() {

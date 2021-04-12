@@ -6,8 +6,7 @@ const { api: client } = require('../../helpers/clients');
 const { log } = require('../../helpers/output');
 
 const handleSync = async () => {
-    const cwd = process.cwd();
-    const hkubeFile = await Repository.readHkubeFile(cwd);
+    const hkubeFile = await Repository.readHkubeFile();
     let response = null;
     try {
         response = await client.post(
