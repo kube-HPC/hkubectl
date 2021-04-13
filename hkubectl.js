@@ -45,6 +45,11 @@ const main = async () => {
         type: 'string',
         default: '/hkube/api-server/'
     });
+    yargs.options('dataSourcePathPrefix', {
+        description: 'path prefix url of hkube api endpoint',
+        type: 'string',
+        default: '/hkube/datasources-service/'
+    });
     yargs.options('verbose', {
         description: 'verbose logging',
         type: 'boolean'
