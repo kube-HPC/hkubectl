@@ -6,6 +6,7 @@ const merge = require('lodash.merge');
 const FormData = require('form-data');
 const ora = require('ora');
 const expandTilde = require('expand-tilde');
+const formatSize = require('pretty-bytes');
 
 const { postFile, getUntil, post, get } = require('../../../helpers/request-helper');
 const { zipDirectory } = require('../../../helpers/zipper');
@@ -158,8 +159,9 @@ const handleApply = async ({ endpoint, rejectUnauthorized, name, file, noWait, s
     let error;
     const spinner = ora({ text: 'Build starting', spinner: 'line' }).start();
     try {
-        let stream; let
-            fileData;
+        let stream;
+        let fileData;
+        let stats;
         if (file) {
             const fileContent = readFile(file);
             if (fileContent.error) {
@@ -196,15 +198,16 @@ const handleApply = async ({ endpoint, rejectUnauthorized, name, file, noWait, s
                     expandedPath
                 );
             }
-            const stats = await fse.stat(codePath);
+            stats = await fse.stat(codePath);
             if (stats.isDirectory()) {
                 // create zip file
                 const zipFileName = await zipDirectory(codePath, { tmpFile: true, spinner });
                 codePath = zipFileName;
+                stats = await fse.stat(codePath);
             }
             stream = fse.createReadStream(codePath);
         }
-        spinner.text = 'Uploading algorithm data';
+        spinner.text = `Uploading algorithm data (size is ${stats && formatSize(stats.size)})`;
         const formData = new FormData();
         formData.append('payload', JSON.stringify(body));
         formData.append('file', stream || '');
