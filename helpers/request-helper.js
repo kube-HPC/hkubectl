@@ -32,7 +32,9 @@ const _request = async ({ endpoint, rejectUnauthorized, path, method, body, form
             json: true,
             data: body || formData,
             headers: formData ? formData.getHeaders() : {},
-            timeout
+            timeout,
+            maxBodyLength: 1e15,
+            maxContentLength: 1e15
         });
     }
     catch (e) {
