@@ -25,4 +25,8 @@ jobs:
       - run: npm ci
       - run: NODE_ENV=test npm run-script test-travis
       - run: npm run build
-      
+      - run: sha512sum ./output/* > ./output/checksums.txt
+      - uses: actions/upload-artifact@v2
+        with:
+          name: output
+          path: ./output/
