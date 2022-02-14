@@ -32,6 +32,9 @@ jobs:
           echo TAG=$(git describe --abbrev=0) >> $GITHUB_ENV
       - run: git push --follow-tags
       - run: npm run build
+      - name: Checksum
+        working-directory: ./output/
+        run: sha512sum * > checksums.txt
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -69,3 +72,12 @@ jobs:
           asset_path: ./output/hkubectl-win.exe
           asset_name: hkubectl-win.exe
           asset_content_type: octet-stream
+      - name: Upload Release Asset Checksums
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./output/checksums.txt
+          asset_name: checksums.txt
+          asset_content_type: text/plain
