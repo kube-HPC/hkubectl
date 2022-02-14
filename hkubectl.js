@@ -69,7 +69,7 @@ const main = async () => {
         global.args = args;
         setupClient(global.args);
     });
-    const args = yargs.argv;
+    const args = await yargs.argv;
     if (!args._[0]) {
         if (args.endpoint) {
             yargs.showHelp();

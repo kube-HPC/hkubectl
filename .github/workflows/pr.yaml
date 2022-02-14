@@ -25,4 +25,7 @@ jobs:
       - run: npm ci
       - run: NODE_ENV=test npm run-script test-travis
       - run: npm run build
-      
+      - uses: actions/upload-artifact@v2
+        with:
+          name: output
+          path: ./output/
