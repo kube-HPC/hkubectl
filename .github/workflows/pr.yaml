@@ -27,7 +27,9 @@ jobs:
       - run: npm run build
       - name: Checksum
         working-directory: ./output/
-        run: sha256sum * > checksums.txt
+        run: |
+          sha256sum * > checksums.txt
+          sha256sum *
       - uses: actions/upload-artifact@v2
         with:
           name: output
