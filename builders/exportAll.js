@@ -8,7 +8,7 @@ const exportAll = {
             yargs.command(cmd);
         });
         yargs.options('endpoint', {
-            alias: ['o'],
+            alias: ['e'],
             description: 'url of hkube api endpoint',
             type: 'string',
             default: 'http://127.0.0.1/hkube/api-server/'

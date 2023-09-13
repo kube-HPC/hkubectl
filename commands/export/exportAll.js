@@ -1,76 +1,88 @@
 const fs = require('fs');
 const path = require('path');
+const yaml = require('js-yaml');
 const { get } = require('../../helpers/request-helper');
-const { getHandler } = require('../store/algorithms/get');
 
-async function getAlgorithmData(argv) {
-    const algorithmPath = 'store/algorithms/';
-    const algorithmData = await get({
+async function fetchAlgorithms(argv) {
+    const algoPath = 'store/algorithms';
+    const algorithms = await get({
         ...argv,
-        path: algorithmPath
+        path: algoPath
     });
-    if (!algorithmData || !algorithmData.result) {
-        return null;
+    if (!algorithms || !algorithms.result) {
+        return algorithms;
     }
-    return algorithmData.result;
+    return algorithms.result;
+}
+
+async function fetchAndSaveAlgorithms(argv) {
+    const algorithmList = await fetchAlgorithms(argv);
+
+    if (!algorithmList || algorithmList.length === 0) {
+        console.log('No algorithms found.');
+        return;
+    }
+
+    const outputDirectory = argv.o || 'default_output_directory';
+    const outputFormat = argv.f || 'json';
+
+    // Ensure the output directory exists
+    if (!fs.existsSync(outputDirectory)) {
+        fs.mkdirSync(outputDirectory, { recursive: true });
+    }
+
+    // Loop through the algorithms and save their data based on the outputFormat
+    if (outputFormat === 'json') {
+        for (const algorithm of algorithmList) {
+            const filePath = path.join(outputDirectory, `${algorithm.name}.json`);
+            fs.writeFileSync(filePath, JSON.stringify(algorithm, null, 2));
+            console.log(`Saved ${algorithm.name} JSON to ${filePath}`);
+        }
+    }
+    else if (outputFormat === 'yaml') {
+        for (const algorithm of algorithmList) {
+            const filePath = path.join(outputDirectory, `${algorithm.name}.yaml`);
+            fs.writeFileSync(filePath, yaml.safeDump(algorithm));
+            console.log(`Saved ${algorithm.name} YAML to ${filePath}`);
+        }
+    }
+    else {
+        console.log(`Output format ${outputFormat} not supported.`);
+    }
 }
 
 module.exports = {
-    command: 'exportAll -o [/path/to/output/directory]',
-    alias: ['o'],
-    description: 'Export all algorithms from source environment',
-    options: {
-    },
+    command: 'exportAll',
+    description: 'Fetch and save algorithms as JSON files in a chosen directory',
     builder: (yargs) => {
         yargs.positional('directory', {
-            demandOption: 'Please provide the full directory',
-            describe: 'your/output/directory',
+            demandOption: 'Please provide the directory to save the algorithms to',
+            describe: 'path/of/your/directory',
             type: 'string'
         });
-        yargs.options('endpoint', {
-            description: 'URL of hkube API endpoint',
-            type: 'string',
-            default: 'http://127.0.0.1/hkube/api-server/'
-        }).options('rejectUnauthorized', {
-            description: 'Set to false to ignore certificate signing errors. Useful for self-signed TLS certificate',
-            type: 'boolean',
-            default: 'true'
-        }).options('output', {
-            alias: ['o'],
-            description: 'Path to the output directory where JSON/YAML files will be stored',
-            type: 'string',
-            default: false
+        yargs.options({
+            outputFolder: {
+                describe: 'Output folder',
+                type: 'string',
+                default: 'default_output_directory',
+                alias: ['o']
+            },
+            format: {
+                describe: 'Output format (e.g., json, yaml)',
+                type: 'string',
+                default: 'json',
+                alias: ['f']
+            },
         });
     },
     handler: async (argv) => {
         try {
-            const sourceAlgorithms = await getHandler(argv);
-            if (!sourceAlgorithms || sourceAlgorithms.length === 0) {
-                console.log('No algorithms found in the source environment.');
-                return;
-            }
-
-            // Create the output directory if it doesn't exist
-            const outputDirectory = path.resolve(argv.output);
-            if (!fs.existsSync(outputDirectory)) {
-                fs.mkdirSync(outputDirectory, { recursive: true });
-            }
-
-            // Export each algorithm as a JSON/YAML file
-            for (const algorithm of sourceAlgorithms) {
-                const algorithmData = await getAlgorithmData(argv, algorithm);
-                if (algorithmData) {
-                    const filePath = path.join(outputDirectory, `${algorithm}.json`);
-                    fs.writeFileSync(filePath, JSON.stringify(algorithmData, null, 2));
-                    console.log(`Exported ${algorithm} to ${filePath}`);
-                }
-                else {
-                    console.warn(`Skipping export of ${algorithm} as it couldn't be retrieved from the source environment.`);
-                }
-            }
-        // eslint-disable-next-line brace-style
-        } catch (error) {
-            console.error('Error exporting algorithms:', error.message);
+            // eslint-disable-next-line no-param-reassign
+            argv.endpoint = argv.e || argv.endpoint;
+            await fetchAndSaveAlgorithms(argv);
+        }
+        catch (error) {
+            console.error('Error fetching and saving algorithms:', error.message);
         }
     }
 };
