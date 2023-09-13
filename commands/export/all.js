@@ -52,7 +52,7 @@ async function fetchAndSaveAlgorithms(argv) {
 }
 
 module.exports = {
-    command: 'exportAll',
+    command: 'all',
     description: 'Fetch and save algorithms as JSON files in a chosen directory',
     builder: (yargs) => {
         yargs.positional('directory', {

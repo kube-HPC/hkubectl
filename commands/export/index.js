@@ -1,4 +1,4 @@
-const exportAll = require('./exportAll');
+const exportAll = require('./all');
 
 module.exports = {
     exportAll
