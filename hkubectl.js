@@ -5,6 +5,7 @@ const { readConfig } = require('./helpers/config');
 const { config } = require('./builders/config');
 const { exec } = require('./builders/exec');
 const { exportAll } = require('./builders/export');
+const { importAll } = require('./builders/import');
 const algorithms = require('./builders/algorithm');
 const pipelines = require('./builders/pipeline');
 const dryRun = require('./builders/dry-run');
@@ -28,6 +29,7 @@ const main = async () => {
     yargs.config(configFile);
     yargs.command(exec);
     yargs.command(exportAll);
+    yargs.command(importAll);
     yargs.command(algorithms);
     yargs.command(pipelines);
     yargs.command(dryRun);
