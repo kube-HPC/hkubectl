@@ -1,8 +1,8 @@
 const commands = require('../commands/import/index');
 
-const importAll = {
-    command: 'import <command>',
-    description: 'Import all data to source environment',
+const importPipelines = {
+    command: 'import pipelines <command>',
+    description: 'Import all pipelines to source environment',
     builder: (yargs) => {
         Object.values(commands).forEach((cmd) => {
             yargs.command(cmd);
@@ -24,5 +24,5 @@ const importAll = {
 };
 
 module.exports = {
-    importAll
+    importPipelines
 };
