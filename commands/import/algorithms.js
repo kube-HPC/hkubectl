@@ -8,16 +8,16 @@ async function importAlgorithmData(argv) {
 
     try {
         await fs.promises.access(inputDirectory);
-
-        const files = await fs.promises.readdir(inputDirectory);
-        if (files.length === 0) {
+    }
+    catch (error) {
+        console.error(`Error accessing directory: ${error.message}`);
+    }
+    try {
+        const algorithmFiles = await fs.promises.readdir(inputDirectory);
+        if (algorithmFiles.length === 0) {
             console.error(`Input directory '${inputDirectory}' is empty.`);
             return;
         }
-
-        await fs.promises.access(inputDirectory);
-
-        const algorithmFiles = await fs.promises.readdir(inputDirectory);
         const supportedAlgorithmFiles = algorithmFiles.filter(file => file.endsWith('.json') || file.endsWith('.yaml'));
 
         if (supportedAlgorithmFiles.length === 0) {
@@ -65,7 +65,7 @@ async function importAlgorithmData(argv) {
         await importAlgorithms(argv, parsedAlgorithms);
     }
     catch (error) {
-        console.error(`Error importing files: ${error.message}`);
+        console.error(`Error importing algorithms: ${error.message}`);
     }
 }
 

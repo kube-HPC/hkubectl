@@ -12,7 +12,7 @@ async function importData(argv) {
         await importAlgorithmData({ ...argv, inputDirectory: inputAlgorithmsDirectory });
     }
     catch (error) {
-        console.error(`Error importing files: ${error.message}`);
+        console.error(`Error during import: ${error.message}`);
     }
 }
 
@@ -40,7 +40,7 @@ module.exports = {
             await importData(argv);
         }
         catch (error) {
-            console.error('Error importing files:', error.message);
+            console.error('Error during import all data:', error.message);
         }
     },
 };

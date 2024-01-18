@@ -32,7 +32,7 @@ async function exportPipelineData(argv) {
         }
     }
     catch (error) {
-        console.error(`Error exporting pipelines: ${error.message}`);
+        console.error(`Error geting and saving pipelines: ${error.message}`);
     }
 }
 

@@ -42,7 +42,7 @@ async function importPipelineData(argv) {
         await importPipelines(argv, parsedPipelines);
     }
     catch (error) {
-        console.error(`Error importing files: ${error.message}`);
+        console.error(`Error importing pipelines: ${error.message}`);
     }
 }
 
