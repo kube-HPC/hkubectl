@@ -3,12 +3,16 @@ const path = require('path');
 const yaml = require('js-yaml');
 const { getAlgorithms } = require('../../utils/exportUtils');
 
-async function exportAlgorithmData(argv, data) {
-    const outputDirectory = argv.o || 'default/output/directory';
+async function exportAlgorithmData(argv) {
+    const { outputDirectory } = argv;
     const outputFormat = argv.f || 'json';
     try {
-        // Ensure the output directory exists
-        await fs.promises.access(outputDirectory);
+        const algorithmList = await getAlgorithms(argv);
+
+        if (!algorithmList || algorithmList.length === 0) {
+            console.log('No algorithms found.');
+            return;
+        }
 
         try {
             await fs.promises.access(outputDirectory);
@@ -16,7 +20,7 @@ async function exportAlgorithmData(argv, data) {
         catch (err) {
             console.error(`Error accessing diectory: ${err.message}`);
         }
-        for (const file of data) {
+        for (const file of algorithmList) {
             const fileName = `${file.name}.${outputFormat === 'json' ? 'json' : 'yaml'}`;
             const filePath = path.join(outputDirectory, fileName);
             if (outputFormat === 'json') {
@@ -32,32 +36,17 @@ async function exportAlgorithmData(argv, data) {
         console.error(`Error exporting algorithms: ${error.message}`);
     }
 }
-async function getAndSave(argv) {
-    const algorithmList = await getAlgorithms(argv);
-
-    if (!algorithmList || algorithmList.length === 0) {
-        console.log('No algorithms found.');
-        return;
-    }
-    await exportAlgorithmData(argv, algorithmList);
-}
 
 module.exports = {
-    command: 'algorithms',
+    command: 'algorithms <outputDirectory>',
     description: 'get and save all algorithms as JSON/YAML files in a chosen directory',
     builder: (yargs) => {
-        yargs.positional('directory', {
+        yargs.positional('outputDirectory', {
             demandOption: 'Please provide the directory to save the algorithms to',
             describe: 'path/of/your/directory',
-            type: 'string'
+            type: 'string',
         });
         yargs.options({
-            outputFolder: {
-                describe: 'Output folder',
-                type: 'string',
-                default: 'default_output_directory',
-                alias: ['o']
-            },
             format: {
                 describe: 'Output format (e.g., json, yaml)',
                 type: 'string',
@@ -70,10 +59,11 @@ module.exports = {
         try {
             // eslint-disable-next-line no-param-reassign
             argv.endpoint = argv.e || argv.endpoint;
-            await getAndSave(argv);
+            await exportAlgorithmData(argv);
         }
         catch (error) {
             console.error('Error geting and saving algorithms:', error.message);
         }
-    }
+    },
+    exportAlgorithmData
 };

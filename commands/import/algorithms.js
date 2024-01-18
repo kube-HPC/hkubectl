@@ -4,12 +4,11 @@ const yaml = require('js-yaml');
 const { importAlgorithms, parseUserVals, replaceValsInFile } = require('../../utils/importUtils');
 
 async function importAlgorithmData(argv) {
-    const inputDirectory = argv.i;
+    const { inputDirectory } = argv;
 
     try {
         await fs.promises.access(inputDirectory);
 
-        // Check if the input directory is empty
         const files = await fs.promises.readdir(inputDirectory);
         if (files.length === 0) {
             console.error(`Input directory '${inputDirectory}' is empty.`);
@@ -36,7 +35,6 @@ async function importAlgorithmData(argv) {
                 const result = replaceValsInFile(fileContent, valueMapping);
                 fileContent = result.fileContent;
 
-                // Update replacedCounts with counts for each oldRegistry
                 Object.entries(result.replacedCounts).forEach(([oldValue, count]) => {
                     if (ValuesCounts[oldValue]) {
                         ValuesCounts[oldValue] += count;
@@ -58,10 +56,9 @@ async function importAlgorithmData(argv) {
                 console.error(`Error parsing algorithm file ${file}: ${error.message}`);
             }
         }
-        // Print replaced counts for each oldRegistry
-        Object.entries(ValuesCounts).forEach(([oldRegistry, count]) => {
+        Object.entries(ValuesCounts).forEach(([oldValue, count]) => {
             if (count > 0) {
-                console.log(`${count} occurrences of "${oldRegistry}" found and changed`);
+                console.log(`${count} occurrences of "${oldValue}" found and changed`);
             }
         });
 
@@ -73,21 +70,15 @@ async function importAlgorithmData(argv) {
 }
 
 module.exports = {
-    command: 'algorithms',
+    command: 'algorithms <inputDirectory>',
     description: 'Import your algorithms from a chosen directory to your Hkube environment',
     builder: (yargs) => {
-        yargs.positional('directory', {
+        yargs.positional('inputDirectory', {
             demandOption: 'Please provide the directory to import the algorithms from',
             describe: 'path/of/your/directory',
             type: 'string'
         });
         yargs.options({
-            outputFolder: {
-                describe: 'Origin directory to import the algorithms from',
-                type: 'string',
-                default: 'default/Origin/directory',
-                alias: ['i']
-            },
             registry: {
                 describe: 'docker registry for importing algorithms (e.g docker.io, myInternalRegistry)',
                 type: 'string',
@@ -105,4 +96,5 @@ module.exports = {
             console.error('Error importing algorithms:', error.message);
         }
     },
+    importAlgorithmData
 };

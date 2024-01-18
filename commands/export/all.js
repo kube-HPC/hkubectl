@@ -1,85 +1,48 @@
 const fs = require('fs');
 const path = require('path');
-const yaml = require('js-yaml');
-const { getAlgorithms, getPipelines } = require('../../utils/exportUtils');
+const { exportPipelineData } = require('./pipelines');
+const { exportAlgorithmData } = require('./algorithms');
 
-async function exportData(argv, data, dataType = false) {
-    const outputFormat = argv.f || 'json';
-
-    let outputDirectory;
-    if (dataType === false) {
-        outputDirectory = path.join(argv.o, 'pipelines');
-    }
-    else {
-        outputDirectory = path.join(argv.o, 'algorithms');
-    }
-    // Ensure the output directory exists
-    if (!fs.existsSync(argv.o)) {
-        console.log(`Folder "${argv.o}" does not exist.`);
-    }
-
-    else {
-        fs.mkdirSync(outputDirectory, { recursive: true });
-        console.log(`Folder "${outputDirectory}" created.`);
-    }
-
-    // Loop through the data and save it based on the outputFormat
-    for (const file of data) {
-        const filePath = path.join(outputDirectory, `${file.name}.${outputFormat}`);
-        if (outputFormat === 'json') {
-            fs.writeFileSync(filePath, JSON.stringify(file, null, 2));
-            console.log(`Saved ${file.name} JSON to ${filePath}`);
-        }
-        else if (outputFormat === 'yaml') {
-            fs.writeFileSync(filePath, yaml.safeDump(file));
-            console.log(`Saved ${file.name} YAML to ${filePath}`);
+async function exportData(argv) {
+    try {
+        const { outputDirectory } = argv;
+        const outputPipelineDirectory = path.join(outputDirectory, 'pipelines');
+        if (!fs.existsSync(outputDirectory)) {
+            console.error(`Folder "${outputPipelineDirectory}" does not exist.`);
         }
         else {
-            console.log(`Output format ${outputFormat} not supported.`);
+            fs.mkdirSync(outputPipelineDirectory, { recursive: true });
+            console.log(`Folder "${outputPipelineDirectory}" created.`);
         }
-    }
-}
+        await exportPipelineData({ ...argv, outputDirectory: outputPipelineDirectory });
 
-async function getAndSave(argv) {
-    const pipelineList = await getPipelines(argv);
-    if (!pipelineList || pipelineList.length === 0) {
-        console.log('No pipelines found.');
-        return;
+        const outputAlgorithmsDirectory = path.join(outputDirectory, 'algorithms');
+        if (!fs.existsSync(outputDirectory)) {
+            console.error(`Folder "${outputAlgorithmsDirectory}" does not exist.`);
+        }
+        else {
+            fs.mkdirSync(outputAlgorithmsDirectory, { recursive: true });
+            console.log(`Folder "${outputAlgorithmsDirectory}" created.`);
+        }
+        await exportAlgorithmData({ ...argv, outputDirectory: outputAlgorithmsDirectory });
     }
-    await exportData(argv, pipelineList, false);
-    const algorithmList = await getAlgorithms(argv);
-
-    if (!algorithmList || algorithmList.length === 0) {
-        console.log('No algorithms found.');
-        return;
+    catch (error) {
+        console.error(`Error importing files: ${error.message}`);
     }
-    await exportData(argv, algorithmList, true);
 }
 
 module.exports = {
-    command: 'all',
-    description: 'get and save all algorithms/pipelines as JSON/YAML files in a chosen directory',
+    command: 'all <outputDirectory>',
+    description: 'Get and save all algorithms/pipelines as JSON/YAML files in a chosen directory',
     builder: (yargs) => {
-        yargs.positional('directory', {
+        yargs.positional('outputDirectory', {
             demandOption: 'Please provide the directory to save the algorithms to',
-            describe: 'path/of/your/directory',
-            type: 'string'
+            describe: 'Path of your directory',
+            type: 'string',
         });
         yargs.options({
-            dataType: {
-                describe: 'Data type to export (e.g. algorithms, pipelines)',
-                type: 'string',
-                default: 'algorithms',
-                alias: ['d']
-            },
-            outputFolder: {
-                describe: 'Output folder',
-                type: 'string',
-                default: 'default_output_directory',
-                alias: ['o']
-            },
             format: {
-                describe: 'Output format (e.g. json, yaml)',
+                describe: 'Output format (e.g., json, yaml)',
                 type: 'string',
                 default: 'json',
                 alias: ['f']
@@ -90,10 +53,10 @@ module.exports = {
         try {
             // eslint-disable-next-line no-param-reassign
             argv.endpoint = argv.e || argv.endpoint;
-            await getAndSave(argv);
+            await exportData(argv);
         }
         catch (error) {
-            console.error('Error geting and saving algorithms:', error.message);
+            console.error('Error getting and saving data:', error.message);
         }
     }
 };

@@ -1,99 +1,15 @@
-const fs = require('fs');
 const path = require('path');
-const yaml = require('js-yaml');
-const { parseUserVals, replaceValsInFile, importDataHandler } = require('../../utils/importUtils');
-const ALGO_STORE_PATH = 'store/algorithms';
-const PIPELINE_STORE_PATH = 'store/pipelines';
+const { importPipelineData } = require('./pipelines');
+const { importAlgorithmData } = require('./algorithms');
 
 async function importData(argv) {
-    const inputDirectory = argv.i;
+    const { inputDirectory } = argv;
 
     try {
-        // Check if the input directory exists
-        await fs.promises.access(inputDirectory);
-
-        // Check if the input directory is empty
-        const files = await fs.promises.readdir(inputDirectory);
-        if (files.length === 0) {
-            console.error(`Input directory '${inputDirectory}' is empty.`);
-            return;
-        }
-
-        // Check if both 'pipelines' and 'algorithms' folders exist
-        const pipelinesFolder = path.join(inputDirectory, 'pipelines');
-        const algorithmsFolder = path.join(inputDirectory, 'algorithms');
-
-        await fs.promises.access(pipelinesFolder);
-        await fs.promises.access(algorithmsFolder);
-
-        // Get a list of supported files from both folders
-        const pipelineFiles = await fs.promises.readdir(pipelinesFolder);
-        const algorithmFiles = await fs.promises.readdir(algorithmsFolder);
-        const supportedPipelineFiles = pipelineFiles.filter(file => file.endsWith('.json') || file.endsWith('.yaml'));
-        const supportedAlgorithmFiles = algorithmFiles.filter(file => file.endsWith('.json') || file.endsWith('.yaml'));
-
-        if (supportedPipelineFiles.length === 0 && supportedAlgorithmFiles.length === 0) {
-            console.warn('No supported files found in the input directory.');
-            return;
-        }
-
-        const parsedPipelines = [];
-        const parsedAlgorithms = [];
-        const ValuesCounts = {};
-
-        for (const file of supportedPipelineFiles) {
-            const filePath = path.join(pipelinesFolder, file);
-            const fileContent = await fs.promises.readFile(filePath, 'utf-8');
-            try {
-                const parsedData = file.endsWith('.json')
-                    ? JSON.parse(fileContent)
-                    : yaml.safeLoad(fileContent);
-
-                parsedPipelines.push(parsedData);
-            }
-            catch (error) {
-                console.error(`Error parsing pipeline file ${file}: ${error.message}`);
-            }
-        }
-
-        for (const file of supportedAlgorithmFiles) {
-            const filePath = path.join(algorithmsFolder, file);
-            let fileContent = await fs.promises.readFile(filePath, 'utf-8');
-            const valueMapping = parseUserVals(argv.r);
-            if (valueMapping) {
-                const result = replaceValsInFile(fileContent, valueMapping);
-                // eslint-disable-next-line no-const-assign
-                fileContent = result.fileContent;
-                // eslint-disable-next-line no-loop-func
-                Object.entries(result.replacedCounts).forEach(([oldValue, count]) => {
-                    if (ValuesCounts[oldValue]) {
-                        ValuesCounts[oldValue] += count;
-                    }
-                    else {
-                        ValuesCounts[oldValue] = count;
-                    }
-                });
-            }
-
-            try {
-                const parsedData = file.endsWith('.json')
-                    ? JSON.parse(fileContent)
-                    : yaml.safeLoad(fileContent);
-
-                parsedAlgorithms.push(parsedData);
-            }
-            catch (error) {
-                console.error(`Error parsing algorithm file ${file}: ${error.message}`);
-            }
-        }
-        Object.entries(ValuesCounts).forEach(([oldValue, count]) => {
-            if (count > 0) {
-                console.log(`${count} occurrences of "${oldValue}" found and changed`);
-            }
-        });
-
-        await importDataHandler(argv, ALGO_STORE_PATH, parsedAlgorithms);
-        await importDataHandler(argv, PIPELINE_STORE_PATH, parsedPipelines);
+        const inputPipelineDirectory = path.join(inputDirectory, 'pipelines');
+        await importPipelineData({ ...argv, inputDirectory: inputPipelineDirectory });
+        const inputAlgorithmsDirectory = path.join(inputDirectory, 'algorithms');
+        await importAlgorithmData({ ...argv, inputDirectory: inputAlgorithmsDirectory });
     }
     catch (error) {
         console.error(`Error importing files: ${error.message}`);
@@ -101,21 +17,15 @@ async function importData(argv) {
 }
 
 module.exports = {
-    command: 'all',
-    description: 'Import your algorithms/pipelines as JSON/YAML files from a chosen directory to your Hkube environment',
+    command: 'all <inputDirectory>',
+    description: 'Import your algorithms/pipelines files from a chosen directory to your Hkube environment',
     builder: (yargs) => {
-        yargs.positional('directory', {
+        yargs.positional('inputDirectory', {
             demandOption: 'Please provide the directory to import the algorithms from',
             describe: 'path/of/your/directory',
             type: 'string'
         });
         yargs.options({
-            outputFolder: {
-                describe: 'Origin directory to import the algorithms from',
-                type: 'string',
-                default: 'default/Origin/directory',
-                alias: ['i']
-            },
             registry: {
                 describe: 'docker registry for importing algorithms (e.g docker.io, myInternalRegistry)',
                 type: 'string',

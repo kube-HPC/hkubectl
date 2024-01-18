@@ -34,23 +34,6 @@ async function importPipelines(argv, pipelinedata) {
     });
 }
 
-async function importDataHandler(argv, storePath, data) {
-    const response = await post({
-        ...argv,
-        path: storePath,
-        body: data,
-    });
-
-    response.result.forEach((result) => {
-        if (result.error) {
-            console.error(result.error.message);
-        }
-        else {
-            console.log(`Successfully imported ${result.name}`);
-        }
-    });
-}
-
 const replaceValsInFile = (fileContent, Mappings) => {
     const replacedCounts = {};
     const codeRegex = new RegExp('Code', 'g');
@@ -89,7 +72,6 @@ function parseUserVals(userValues) {
 module.exports = {
     importAlgorithms,
     parseUserVals,
-    importDataHandler,
     importPipelines,
     replaceValsInFile
 };
