@@ -17,18 +17,19 @@ async function exportPipelineData(argv) {
             await fs.promises.access(outputDirectory);
         }
         catch (err) {
-            console.error(`Error accessing directory: ${err.message}`);
+            console.error(`directory '${outputDirectory}' does not exists: ${err.message}`);
+            return;
         }
-        for (const file of pipelineList) {
-            const fileName = `${file.name}.${outputFormat === 'json' ? 'json' : 'yaml'}`;
+        for (const pipeline of pipelineList) {
+            const fileName = `${pipeline.name}.${outputFormat === 'json' ? 'json' : 'yaml'}`;
             const filePath = path.join(outputDirectory, fileName);
             if (outputFormat === 'json') {
-                await fs.promises.writeFile(filePath, JSON.stringify(file, null, 2));
+                await fs.promises.writeFile(filePath, JSON.stringify(pipeline, null, 2));
             }
             else if (outputFormat === 'yaml') {
-                await fs.promises.writeFile(filePath, yaml.safeDump(file));
+                await fs.promises.writeFile(filePath, yaml.safeDump(pipeline));
             }
-            console.log(`Saved ${file.name}.${outputFormat} to ${filePath}`);
+            console.log(`Saved ${pipeline.name}.${outputFormat} to ${filePath}`);
         }
     }
     catch (error) {

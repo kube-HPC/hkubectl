@@ -10,7 +10,8 @@ async function importAlgorithmData(argv) {
         await fs.promises.access(inputDirectory);
     }
     catch (error) {
-        console.error(`Error accessing directory: ${error.message}`);
+        console.error(`directory '${inputDirectory}' does not exists: ${error.message}`);
+        return;
     }
     try {
         const algorithmFiles = await fs.promises.readdir(inputDirectory);

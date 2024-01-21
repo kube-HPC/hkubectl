@@ -8,14 +8,17 @@ async function importPipelineData(argv) {
 
     try {
         await fs.promises.access(inputDirectory);
-        const files = await fs.promises.readdir(inputDirectory);
-        if (files.length === 0) {
+    }
+    catch (error) {
+        console.error(`directory '${inputDirectory}' does not exists: ${error.message}`);
+        return;
+    }
+    try {
+        const pipelinesFiles = await fs.promises.readdir(inputDirectory);
+        if (pipelinesFiles.length === 0) {
             console.error(`Input directory '${inputDirectory}' is empty.`);
             return;
         }
-        await fs.promises.access(inputDirectory);
-
-        const pipelinesFiles = await fs.promises.readdir(inputDirectory);
         const supportedPipelinesFiles = pipelinesFiles.filter(file => file.endsWith('.json') || file.endsWith('.yaml'));
 
         if (supportedPipelinesFiles.length === 0) {

@@ -18,7 +18,8 @@ async function exportAlgorithmData(argv) {
             await fs.promises.access(outputDirectory);
         }
         catch (err) {
-            console.error(`Error accessing diectory: ${err.message}`);
+            console.error(`directory '${outputDirectory}' does not exists: ${err.message}`);
+            return;
         }
         for (const file of algorithmList) {
             const fileName = `${file.name}.${outputFormat === 'json' ? 'json' : 'yaml'}`;
