@@ -4,20 +4,17 @@ const yaml = require('js-yaml');
 const { getPipelines } = require('../../utils/exportUtils');
 
 async function exportPipelineData(argv) {
-    const { outputDirectory } = argv;
-    const outputFormat = argv.f || 'json';
     try {
+        const { outputDirectory } = argv;
+        const outputFormat = argv.f || 'json';
         const pipelineList = await getPipelines(argv);
 
         if (!pipelineList || pipelineList.length === 0) {
             console.log('No algorithms found.');
             return;
         }
-        try {
-            await fs.promises.access(outputDirectory);
-        }
-        catch (err) {
-            console.error(`directory '${outputDirectory}' does not exists: ${err.message}`);
+        if (!fs.existsSync(outputDirectory)) {
+            console.error(`Directory "${outputDirectory}" does not exist.`);
             return;
         }
         for (const pipeline of pipelineList) {
@@ -33,7 +30,7 @@ async function exportPipelineData(argv) {
         }
     }
     catch (error) {
-        console.error(`Error geting and saving pipelines: ${error.message}`);
+        console.error(`Error during export pipelines: ${error.message}`);
     }
 }
 
@@ -56,14 +53,9 @@ module.exports = {
         });
     },
     handler: async (argv) => {
-        try {
-            // eslint-disable-next-line no-param-reassign
-            argv.endpoint = argv.e || argv.endpoint;
-            await exportPipelineData(argv);
-        }
-        catch (error) {
-            console.error('Error geting and saving pipelines:', error.message);
-        }
+        // eslint-disable-next-line no-param-reassign
+        argv.endpoint = argv.e || argv.endpoint;
+        await exportPipelineData(argv);
     },
     exportPipelineData
 };

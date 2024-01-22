@@ -4,9 +4,9 @@ const yaml = require('js-yaml');
 const { getAlgorithms } = require('../../utils/exportUtils');
 
 async function exportAlgorithmData(argv) {
-    const { outputDirectory } = argv;
-    const outputFormat = argv.f || 'json';
     try {
+        const { outputDirectory } = argv;
+        const outputFormat = argv.f || 'json';
         const algorithmList = await getAlgorithms(argv);
 
         if (!algorithmList || algorithmList.length === 0) {
@@ -14,11 +14,8 @@ async function exportAlgorithmData(argv) {
             return;
         }
 
-        try {
-            await fs.promises.access(outputDirectory);
-        }
-        catch (err) {
-            console.error(`directory '${outputDirectory}' does not exists: ${err.message}`);
+        if (!fs.existsSync(outputDirectory)) {
+            console.error(`Directory "${outputDirectory}" does not exist.`);
             return;
         }
         for (const file of algorithmList) {
@@ -57,14 +54,9 @@ module.exports = {
         });
     },
     handler: async (argv) => {
-        try {
-            // eslint-disable-next-line no-param-reassign
-            argv.endpoint = argv.e || argv.endpoint;
-            await exportAlgorithmData(argv);
-        }
-        catch (error) {
-            console.error('Error geting and saving algorithms:', error.message);
-        }
+        // eslint-disable-next-line no-param-reassign
+        argv.endpoint = argv.e || argv.endpoint;
+        await exportAlgorithmData(argv);
     },
     exportAlgorithmData
 };

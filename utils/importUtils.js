@@ -36,10 +36,6 @@ async function importPipelines(argv, pipelinedata) {
 
 const replaceValsInFile = (fileContent, Mappings) => {
     const replacedCounts = {};
-    const codeRegex = new RegExp('Code', 'g');
-    // eslint-disable-next-line no-param-reassign
-    fileContent = fileContent.replace(codeRegex, 'Image');
-
     Object.entries(Mappings).forEach(([oldValue, newValue]) => {
         const regex = new RegExp(oldValue, 'g');
         const replacements = (fileContent.match(regex) || []).length;

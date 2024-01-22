@@ -4,16 +4,12 @@ const yaml = require('js-yaml');
 const { importPipelines } = require('../../utils/importUtils');
 
 async function importPipelineData(argv) {
-    const { inputDirectory } = argv;
-
     try {
-        await fs.promises.access(inputDirectory);
-    }
-    catch (error) {
-        console.error(`directory '${inputDirectory}' does not exists: ${error.message}`);
-        return;
-    }
-    try {
+        const { inputDirectory } = argv;
+        if (!fs.existsSync(inputDirectory)) {
+            console.error(`Directory "${inputDirectory}" does not exist.`);
+            return;
+        }
         const pipelinesFiles = await fs.promises.readdir(inputDirectory);
         if (pipelinesFiles.length === 0) {
             console.error(`Input directory '${inputDirectory}' is empty.`);
@@ -60,14 +56,9 @@ module.exports = {
         });
     },
     handler: async (argv) => {
-        try {
-            // eslint-disable-next-line no-param-reassign
-            argv.endpoint = argv.e || argv.endpoint;
-            await importPipelineData(argv);
-        }
-        catch (error) {
-            console.error('Error importing pipelines:', error.message);
-        }
+        // eslint-disable-next-line no-param-reassign
+        argv.endpoint = argv.e || argv.endpoint;
+        await importPipelineData(argv);
     },
     importPipelineData
 };

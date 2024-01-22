@@ -6,24 +6,18 @@ const { exportAlgorithmData } = require('./algorithms');
 async function exportData(argv) {
     try {
         const { outputDirectory } = argv;
-        const outputPipelineDirectory = path.join(outputDirectory, 'pipelines');
         if (!fs.existsSync(outputDirectory)) {
-            console.error(`Folder "${outputPipelineDirectory}" does not exist.`);
+            console.error(`Directory "${outputDirectory}" does not exist.`);
+            return;
         }
-        else {
-            fs.mkdirSync(outputPipelineDirectory, { recursive: true });
-            console.log(`Folder "${outputPipelineDirectory}" created.`);
-        }
+        const outputPipelineDirectory = path.join(outputDirectory, 'pipelines');
+        fs.mkdirSync(outputPipelineDirectory, { recursive: true });
+        console.log(`Folder "${outputPipelineDirectory}" created.`);
         await exportPipelineData({ ...argv, outputDirectory: outputPipelineDirectory });
 
         const outputAlgorithmsDirectory = path.join(outputDirectory, 'algorithms');
-        if (!fs.existsSync(outputDirectory)) {
-            console.error(`Folder "${outputAlgorithmsDirectory}" does not exist.`);
-        }
-        else {
-            fs.mkdirSync(outputAlgorithmsDirectory, { recursive: true });
-            console.log(`Folder "${outputAlgorithmsDirectory}" created.`);
-        }
+        fs.mkdirSync(outputAlgorithmsDirectory, { recursive: true });
+        console.log(`Folder "${outputAlgorithmsDirectory}" created.`);
         await exportAlgorithmData({ ...argv, outputDirectory: outputAlgorithmsDirectory });
     }
     catch (error) {
@@ -42,7 +36,7 @@ module.exports = {
         });
         yargs.options({
             format: {
-                describe: 'Output format (e.g., json, yaml)',
+                describe: 'Output format (e.g. json, yaml)',
                 type: 'string',
                 default: 'json',
                 alias: ['f']
@@ -50,13 +44,8 @@ module.exports = {
         });
     },
     handler: async (argv) => {
-        try {
-            // eslint-disable-next-line no-param-reassign
-            argv.endpoint = argv.e || argv.endpoint;
-            await exportData(argv);
-        }
-        catch (error) {
-            console.error('Error getting and saving data:', error.message);
-        }
+        // eslint-disable-next-line no-param-reassign
+        argv.endpoint = argv.e || argv.endpoint;
+        await exportData(argv);
     }
 };
