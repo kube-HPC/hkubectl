@@ -4,6 +4,12 @@ const chalk = require('chalk');
 const { readConfig } = require('./helpers/config');
 const { config } = require('./builders/config');
 const { exec } = require('./builders/exec');
+const { exportAll } = require('./builders/export');
+const { exportAlgorithms } = require('./builders/exportAlgorithms');
+const { exportPipelines } = require('./builders/exportPipelines');
+const { importAll } = require('./builders/import');
+const { importAlgorithms } = require('./builders/importAlgorithms');
+const { importPipelines } = require('./builders/importPipelines');
 const algorithms = require('./builders/algorithm');
 const pipelines = require('./builders/pipeline');
 const dryRun = require('./builders/dry-run');
@@ -26,6 +32,12 @@ const main = async () => {
 
     yargs.config(configFile);
     yargs.command(exec);
+    yargs.command(exportAll);
+    yargs.command(exportAlgorithms);
+    yargs.command(exportPipelines);
+    yargs.command(importAll);
+    yargs.command(importAlgorithms);
+    yargs.command(importPipelines);
     yargs.command(algorithms);
     yargs.command(pipelines);
     yargs.command(dryRun);
