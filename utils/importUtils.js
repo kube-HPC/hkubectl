@@ -54,7 +54,7 @@ function parseUserVals(userValues) {
         const valuesMap = {};
 
         mappings.forEach(mapping => {
-            const [oldValue, newValue] = mapping.split('=>');
+            const [oldValue, newValue] = mapping.split('^');
             if (oldValue && newValue) {
                 valuesMap[oldValue.trim()] = newValue.trim();
             }
