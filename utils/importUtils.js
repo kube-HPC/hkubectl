@@ -1,10 +1,10 @@
 const { post } = require('../helpers/request-helper');
 
-async function importAlgorithms(argv, algorithmData) {
+async function importAlgorithms(argv, algorithmData, overwrite) {
     const algoPath = 'store/algorithms';
     const response = await post({
         ...argv,
-        path: algoPath,
+        path: `${algoPath}?overwrite=${overwrite}`,
         body: algorithmData,
     });
     response.result.forEach((result) => {
