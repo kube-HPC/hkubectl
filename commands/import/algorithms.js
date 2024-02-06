@@ -5,7 +5,7 @@ const { importAlgorithms, parseUserVals, replaceValsInFile } = require('../../ut
 
 async function importAlgorithmData(argv) {
     try {
-        const { inputDirectory } = argv;
+        const { inputDirectory, overwrite } = argv;
         if (!fs.existsSync(inputDirectory)) {
             console.error(`Directory "${inputDirectory}" does not exist.`);
             return;
@@ -61,7 +61,7 @@ async function importAlgorithmData(argv) {
             }
         });
 
-        await importAlgorithms(argv, parsedAlgorithms);
+        await importAlgorithms(argv, parsedAlgorithms, overwrite);
     }
     catch (error) {
         console.error(`Error importing algorithms: ${error.message}`);
@@ -78,10 +78,17 @@ module.exports = {
             type: 'string'
         });
         yargs.options({
-            registry: {
-                describe: 'docker registry for importing algorithms (e.g docker.io, myInternalRegistry)',
+            replace: {
+                describe: 'Replace a value like docker registry  (e.g docker.io, myInternalRegistry)',
                 type: 'string',
                 alias: ['r']
+            },
+        });
+        yargs.options({
+            overwrite: {
+                describe: 'Should overwrite exsiting algorithms',
+                type: 'boolean',
+                alias: ['or']
             },
         });
     },

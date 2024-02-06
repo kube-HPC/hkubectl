@@ -31,6 +31,13 @@ module.exports = {
                 alias: ['r']
             },
         });
+        yargs.options({
+            overwrite: {
+                describe: 'Should overwrite exsiting algorithms',
+                type: 'boolean',
+                alias: ['or']
+            },
+        });
     },
     handler: async (argv) => {
         // eslint-disable-next-line no-param-reassign
