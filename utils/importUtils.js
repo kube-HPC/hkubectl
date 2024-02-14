@@ -17,11 +17,11 @@ async function importAlgorithms(argv, algorithmData, overwrite) {
     });
 }
 
-async function importPipelines(argv, pipelinedata) {
+async function importPipelines(argv, pipelinedata, overwrite) {
     const pipePath = 'store/pipelines';
     const response = await post({
         ...argv,
-        path: pipePath,
+        path: `${pipePath}?overwrite=${overwrite}`,
         body: pipelinedata,
     });
     response.result.forEach((result) => {
