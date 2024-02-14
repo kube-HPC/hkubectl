@@ -5,7 +5,7 @@ const { importPipelines } = require('../../utils/importUtils');
 
 async function importPipelineData(argv) {
     try {
-        const { inputDirectory } = argv;
+        const { inputDirectory, overwrite } = argv;
         if (!fs.existsSync(inputDirectory)) {
             console.error(`Directory "${inputDirectory}" does not exist.`);
             return;
@@ -38,7 +38,7 @@ async function importPipelineData(argv) {
             }
         }
 
-        await importPipelines(argv, parsedPipelines);
+        await importPipelines(argv, parsedPipelines, overwrite);
     }
     catch (error) {
         console.error(`Error importing pipelines: ${error.message}`);
