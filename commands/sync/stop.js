@@ -1,12 +1,12 @@
 const { post } = require('../../helpers/request-helper');
 
-const startHandler = async ({ endpoint, rejectUnauthorized, algorithmName, devFolder, $0: appName }) => {
+const stopHandler = async ({ endpoint, rejectUnauthorized, algorithmName }) => {
     // get all parameters, decorate,
     const body = {
         name: algorithmName,
         options: {
-            devMode: true,
-            devFolder
+            devMode: false,
+            devFolder: null
         }
     };
     // send update, if doesn't exist, exit.
@@ -22,13 +22,11 @@ const startHandler = async ({ endpoint, rejectUnauthorized, algorithmName, devFo
         console.log(`code: ${res.result.error.code}, message: ${msg}`);
         return;
     }
-    console.log(`algorithm ${algorithmName} modified to be in development mode.`);
-    console.log('to sync the folder to the algorithm run');
-    console.log(`${appName} sync watch -a ${algorithmName} -f localAlgoFolder`);
+    console.log(`algorithm ${algorithmName} removed from development mode.`);
 };
 module.exports = {
-    command: 'start',
-    description: 'start an existing algorithm in development mode',
+    command: 'stop',
+    description: 'removes an algorithm from development mode',
     options: {
     },
     builder: {
@@ -37,15 +35,9 @@ module.exports = {
             describe: 'The name of the algorithm to sync data into',
             type: 'string',
             alias: ['a']
-        },
-        devFolder: {
-            demandOption: true,
-            describe: 'folder in pod to sync to',
-            type: 'string',
-            alias: ['f']
         }
     },
     handler: async (argv) => {
-        await startHandler(argv);
+        await stopHandler(argv);
     }
 };
