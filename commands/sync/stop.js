@@ -27,7 +27,7 @@ module.exports = {
     builder: {
         algorithmName: {
             demandOption: true,
-            describe: 'The name of the algorithm to sync data into',
+            describe: 'The name of the algorithm to stop syncing files into',
             type: 'string',
             alias: ['a']
         }
