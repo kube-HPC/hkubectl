@@ -43,21 +43,6 @@ module.exports = {
             describe: 'folder in pod to sync to',
             type: 'string',
             alias: ['f']
-        },
-        env: {
-            describe: 'algorithm runtime environment',
-            type: 'string',
-            choices: ['python', 'nodejs']
-
-        },
-        entryPoint: {
-            describe: 'the main file of the algorithm',
-            type: 'string',
-            alias: ['e']
-        },
-        baseImage: {
-            describe: 'base image for the algorithm',
-            type: 'string'
         }
     },
     handler: async (argv) => {
