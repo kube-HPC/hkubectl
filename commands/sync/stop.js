@@ -21,7 +21,7 @@ const stopHandler = async ({ endpoint, rejectUnauthorized, algorithmName }) => {
 };
 module.exports = {
     command: 'stop',
-    description: 'removes an algorithm from development mode',
+    description: 'Disengage development mode for an algorithm',
     options: {
     },
     builder: {

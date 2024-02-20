@@ -23,7 +23,7 @@ const startHandler = async ({ endpoint, rejectUnauthorized, algorithmName, devFo
 };
 module.exports = {
     command: 'start',
-    description: 'start an existing algorithm in development mode',
+    description: 'Engage development mode for an algorithm',
     options: {
     },
     builder: {
