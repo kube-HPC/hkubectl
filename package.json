@@ -7,6 +7,7 @@
     "hkubectl": "./hkubectl"
   },
   "scripts": {
+    "watch-testrun": "node hkubectl sync watch -a stayup -f /home/ronshv/dev/hkube/system-test-node/additionalFiles/file1/",
     "lint": "eslint .",
     "pre-commit": "npm run lint && npm run test",
     "test": "mocha tests --colors --recursive",
