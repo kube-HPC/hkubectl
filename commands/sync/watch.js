@@ -102,7 +102,7 @@ const watchHandler = async ({ endpoint, rejectUnauthorized, algorithmName, folde
 
 module.exports = {
     command: 'watch',
-    description: 'watch a local folder, navigate menu to apply changes instantly',
+    description: 'watch a local folder, navigate menu to apply sync changes at will',
     options: {
     },
     builder: {
