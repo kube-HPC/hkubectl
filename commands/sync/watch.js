@@ -27,7 +27,7 @@ const printScrollingLine = (actionLog, addSelectMsg = true) => {
     const timestamp = new Date().toLocaleString();
     let logMessage = `[${timestamp}] ${actionLog}`;
     if (addSelectMsg) {
-        logMessage = `${logMessage}         Please select an option:   `;
+        logMessage = `${logMessage}     Please select an option: `;
     }
     process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
     process.stdout.write(`${logMessage}\n`);
@@ -37,7 +37,7 @@ const startMenu = (printMenu = false) => {
     if (printMenu) {
         console.log('===========================================================');
         console.log('\nWelcome to the sync watch control menu:');
-        console.log('1. Resync the folder');
+        console.log('1. Force apply changes on running algorithms ( Pods will be deleted)');
         console.log('2. Exit');
         console.log('Please select an option:   ');
     }
