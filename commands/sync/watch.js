@@ -7,6 +7,11 @@ const agentRestIngressPath = '/hkube/sync/ui';
 const syncthing = require('../../helpers/syncthing/syncthing.js');
 const { events } = require('../../helpers/consts');
 const { lock } = require('../../helpers/locks');
+const { post, get } = require('../../helpers/request-helper');
+
+const cursorUpCleanLine = '\x1b[1A\x1b[2K';
+// eslint-disable-next-line no-unused-vars
+const body = {};
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -24,7 +29,7 @@ const printScrollingLine = (actionLog, addSelectMsg = true) => {
     if (addSelectMsg) {
         logMessage = `${logMessage}         Please select an option:   `;
     }
-    process.stdout.write('\x1b[1A\x1b[2K'); // Move cursor up one line and clear it
+    process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
     process.stdout.write(`${logMessage}\n`);
 };
 
@@ -40,19 +45,22 @@ const startMenu = (printMenu = false) => {
     rl.question('', (answer) => {
         switch (answer) {
         case '1':
-            process.stdout.write('\x1b[1A\x1b[2K'); // Move cursor up one line and clear it
+            process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
             printScrollingLine('Pressed 1, restarting pods, update in progress...', true);
-            // version upgrade api here //
+            this.body.payload = { ...this.body.payload, syncTimeStamp: new Date().toLocaleTimeString() };
+            this.body.options = JSON.stringify(this.body.options);
+            this.body.payload = JSON.stringify(this.body.payload);
+            post({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: 'store/algorithms/apply', body: this.body });
             startMenu(true);
             break;
         case '2':
-            process.stdout.write('\x1b[1A\x1b[2K'); // Move cursor up one line and clear it
+            process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
             printScrollingLine('Exiting...');
             syncthing._proc.kill();
             _finishedUpdate();
             break;
         default:
-            process.stdout.write('\x1b[1A\x1b[2K'); // Move cursor up one line and clear it
+            process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
             printScrollingLine('Invalid option. Please try again. ');
             // eslint-disable-next-line no-unused-vars
             startMenu();
@@ -62,6 +70,15 @@ const startMenu = (printMenu = false) => {
 };
 
 const watchHandler = async ({ endpoint, rejectUnauthorized, algorithmName, folder, bidi }) => {
+    this._endpoint = endpoint;
+    this._rejectUnauthorized = rejectUnauthorized;
+    this.body = { ...this.body, payload: { name: algorithmName } };
+    this.body = { ...this.body, options: { forceUpdate: true } };
+    const res = await get({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `store/algorithms/${algorithmName}` });
+    if (res.error && res.error.message) {
+        console.error(`error getting algorithm ${algorithmName}. Error: ${res.error.message}`);
+        return;
+    }
     const tunnelUrl = `${endpoint}/${agentSyncIngressPath}`.replace('http', 'ws');
     try {
         const fullPath = path.resolve(folder);
