@@ -12,6 +12,7 @@ const { post, get, del } = require('../../helpers/request-helper');
 const cursorUpCleanLine = '\x1b[1A\x1b[2K';
 // eslint-disable-next-line no-unused-vars
 const body = {};
+let lastLineBeforeApply;
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -23,13 +24,16 @@ const _finishedUpdate = () => {
     console.log('finishing update process, releasing tunnel client and exiting.');
 };
 
-const printScrollingLine = (actionLog, addSelectMsg = true) => {
+const printScrollingLine = (actionLog, addSelectMsg = true, saveLastMessage = true, addTimestamp = true) => {
     const timestamp = new Date().toLocaleString();
-    let logMessage = `[${timestamp}] ${actionLog}`;
+    let logMessage;
+    if (addTimestamp) logMessage = `[${timestamp}] ${actionLog}`;
+    else logMessage = actionLog;
     if (addSelectMsg) {
         logMessage = `${logMessage}     Please select an option: `;
     }
     process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
+    if (saveLastMessage) lastLineBeforeApply = `${logMessage}`;
     process.stdout.write(`${logMessage}\n`);
 };
 
@@ -40,13 +44,13 @@ const startMenu = (printMenu = false) => {
         console.log('1. Force apply changes on running algorithms ( Pods will be deleted)');
         console.log('2. Exit');
         console.log('Please select an option:   ');
+        if (lastLineBeforeApply) console.log(lastLineBeforeApply);
     }
 
     rl.question('', (answer) => {
         switch (answer) {
         case '1':
-            process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
-            printScrollingLine('Pressed 1, restarting pods, update in progress...', true);
+            printScrollingLine('Pressed 1, restarting pods, update in progress...', false, false, false);
             del({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `kubernetes/algorithms/pods/${this._algorithmName}` });
             this.body.payload = { ...this.body.payload, syncTimeStamp: new Date().toLocaleTimeString() };
             this.body.options = JSON.stringify(this.body.options);
@@ -56,13 +60,13 @@ const startMenu = (printMenu = false) => {
             break;
         case '2':
             process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
-            printScrollingLine('Exiting...');
+            printScrollingLine('Exiting...', false, false);
             syncthing._proc.kill();
             _finishedUpdate();
             break;
         default:
             process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
-            printScrollingLine('Invalid option. Please try again. ');
+            printScrollingLine('Invalid option. Please try again. ', true, false);
             // eslint-disable-next-line no-unused-vars
             startMenu();
             break;
@@ -103,10 +107,14 @@ const watchHandler = async ({ endpoint, rejectUnauthorized, algorithmName, folde
             }
             switch (data.type) {
             case events.FolderSummary:
-                printScrollingLine(`[${data.name}] Algorithm ${data.folder} update started `);
+                if (!(data.name === 'local')) {
+                    printScrollingLine(`Algorithm ${data.folder} update started `);
+                }
                 break;
             case events.FolderCompletion:
-                printScrollingLine(`[${data.name}] Algorithm ${data.folder} update done `);
+                if (!(data.name === 'local')) {
+                    printScrollingLine(`Algorithm ${data.folder} update done   `);
+                }
                 break;
             default:
                 break;
