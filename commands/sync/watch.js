@@ -76,6 +76,8 @@ const startMenu = (printMenu = false) => {
 
 const watchHandler = async ({ endpoint, rejectUnauthorized, algorithmName, folder, bidi }) => {
     this._endpoint = endpoint;
+    const endpointParts = endpoint.match(/(https?:\/\/)(.*)/);
+    const [, urlPrefix, baseUrl] = endpointParts;
     this._rejectUnauthorized = rejectUnauthorized;
     this._algorithmName = algorithmName;
     this.body = { ...this.body, payload: { name: algorithmName } };
@@ -85,7 +87,8 @@ const watchHandler = async ({ endpoint, rejectUnauthorized, algorithmName, folde
         console.error(`error getting algorithm ${algorithmName}. Error: ${res.error.message}`);
         return;
     }
-    const tunnelUrl = `${endpoint}/${agentSyncIngressPath}`.replace('http', 'ws');
+    this._syncPath = urlPrefix + path.join(baseUrl, agentSyncIngressPath); // avoids removing the '//' after the protocol
+    const tunnelUrl = this._syncPath.replace('http', 'ws'); // support both ws and wss
     try {
         const fullPath = path.resolve(folder);
         console.log(`watching folder ${fullPath}`);
@@ -98,8 +101,8 @@ const watchHandler = async ({ endpoint, rejectUnauthorized, algorithmName, folde
         finally {
             unlock();
         }
-
-        await syncthing.start({ algorithmName, tunnelUrl: `${endpoint}/${agentRestIngressPath}`, tunnelPort });
+        this._syncPath = urlPrefix + path.join(baseUrl, agentRestIngressPath);
+        await syncthing.start({ algorithmName, tunnelUrl: this._syncPath, tunnelPort, rejectUnauthorized: this._rejectUnauthorized });
         await syncthing.addFolder({ path: fullPath, algorithmName, bidi });
         syncthing.on('event', data => {
             if (data.folder !== algorithmName) {

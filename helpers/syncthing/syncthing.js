@@ -37,7 +37,7 @@ class Syncthing extends EventEmitter {
         await delay(1000);
     }
 
-    async start({ envs = {}, tunnelUrl, tunnelPort, algorithmName } = {}) {
+    async start({ envs = {}, tunnelUrl, tunnelPort, algorithmName, rejectUnauthorized } = {}) {
         this._init({ algorithmName });
         const unlock = await lock('start');
         try {
@@ -58,7 +58,7 @@ class Syncthing extends EventEmitter {
                 console.error(err.message || err);
             });
 
-            this._local = new Api({ apiKey: this._apiKey, baseUrl: `http://localhost:${this._restPort}`, name: 'local' });
+            this._local = new Api({ apiKey: this._apiKey, baseUrl: `http://localhost:${this._restPort}`, name: 'local', rejectUnauthorized });
             await this._local.isReady();
             await this._local._getEvents();
             await this._local.setListenPort({ port: this._localSyncPort });
@@ -72,7 +72,7 @@ class Syncthing extends EventEmitter {
             unlock();
         }
 
-        this._remote = new Api({ apiKey: this._apiKey, baseUrl: tunnelUrl, name: 'remote' });
+        this._remote = new Api({ apiKey: this._apiKey, baseUrl: tunnelUrl, name: 'remote', rejectUnauthorized });
         await this._remote.isReady();
         await this._remote._getEvents();
         console.log('remote sync server ready');
