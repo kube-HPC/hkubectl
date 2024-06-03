@@ -125,7 +125,7 @@ class SyncthingApi extends EventEmitter {
                 fsWatcherEnabled: true,
                 fsWatcherDelayS: 1,
                 maxConflicts: 0,
-                copyOwnershipFromParent: true,
+                copyOwnershipFromParent: false,
             });
             await this.postConfig(currentConfig);
         }
