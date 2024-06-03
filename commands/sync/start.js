@@ -17,9 +17,10 @@ const startHandler = async ({ endpoint, rejectUnauthorized, algorithmName, devFo
         console.log(`code: ${res.result.error.code}, message: ${msg}`);
         return;
     }
-    console.log(`algorithm ${algorithmName} modified to be in development mode.`);
-    console.log('to sync the folder to the algorithm run');
-    console.log(`${appName} sync watch -a ${algorithmName} -f localAlgoFolder`);
+    console.log(`algorithm ${algorithmName} modified to be in development mode with the synced path being ${devFolder}.`);
+    console.log('to sync the folder to the algorithm run:');
+    console.log(`${appName} sync watch -a ${algorithmName} -f <localAlgoFolder>`);
+    process.exit(0); // release terminal
 };
 module.exports = {
     command: 'start',

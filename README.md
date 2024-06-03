@@ -22,6 +22,7 @@ Options:
 |--rejectUnauthorized|set to false to ignore certificate signing errors. Useful for self signed TLS certificate|boolean|||  
 |--endpoint|url of hkube api endpoint|string|||  
 |--pathPrefix|path prefix url of hkube api endpoint  |string||/hkube/api-server/|  
+|--dataSourcePathPrefix|path prefix url of hkube api endpoint  |string||/hkube/datasources-service/|  
 |--verbose|verbose logging|boolean|||  
 |-j, --json|output json to stdout|boolean|||  
 |--help|Show help|boolean|||  
@@ -124,6 +125,282 @@ Options:
 |-f, --file|file path/name for extra data|string|||  
 |--noWait|if true, does not wait for the execution to finish  |boolean||false|  
 |--noResult|if true, does not show the result of the execution  |boolean||false|  
+### export  
+---  
+```shell  
+$ hkubectl export   
+```  
+Export all pipelines to source environment    
+#### all  
+  
+```shell  
+$ hkubectl export all < outputDirectory >  
+```  
+Get and save all algorithms/pipelines as JSON/YAML files in a chosen directory    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|outputDirectory|Path of your directory|string|true||  
+|-f, --format|Output format (e.g. json, yaml)  |string||json|  
+#### algorithms  
+  
+```shell  
+$ hkubectl export algorithms < outputDirectory >  
+```  
+get and save all algorithms as JSON/YAML files in a chosen directory    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|outputDirectory|path/of/your/directory|string|true||  
+|-f, --format|Output format (e.g., json, yaml)  |string||json|  
+#### pipelines  
+  
+```shell  
+$ hkubectl export pipelines < outputDirectory >  
+```  
+get and save all pipelines as JSON/YAML files in a chosen directory    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|outputDirectory|path/of/your/directory|string|true||  
+|-f, --format|Output format (e.g. json, yaml)  |string||json|  
+### export  
+---  
+```shell  
+$ hkubectl export   
+```  
+Export all pipelines to source environment    
+#### all  
+  
+```shell  
+$ hkubectl export all < outputDirectory >  
+```  
+Get and save all algorithms/pipelines as JSON/YAML files in a chosen directory    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|outputDirectory|Path of your directory|string|true||  
+|-f, --format|Output format (e.g. json, yaml)  |string||json|  
+#### algorithms  
+  
+```shell  
+$ hkubectl export algorithms < outputDirectory >  
+```  
+get and save all algorithms as JSON/YAML files in a chosen directory    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|outputDirectory|path/of/your/directory|string|true||  
+|-f, --format|Output format (e.g., json, yaml)  |string||json|  
+#### pipelines  
+  
+```shell  
+$ hkubectl export pipelines < outputDirectory >  
+```  
+get and save all pipelines as JSON/YAML files in a chosen directory    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|outputDirectory|path/of/your/directory|string|true||  
+|-f, --format|Output format (e.g. json, yaml)  |string||json|  
+### export  
+---  
+```shell  
+$ hkubectl export   
+```  
+Export all pipelines to source environment    
+#### all  
+  
+```shell  
+$ hkubectl export all < outputDirectory >  
+```  
+Get and save all algorithms/pipelines as JSON/YAML files in a chosen directory    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|outputDirectory|Path of your directory|string|true||  
+|-f, --format|Output format (e.g. json, yaml)  |string||json|  
+#### algorithms  
+  
+```shell  
+$ hkubectl export algorithms < outputDirectory >  
+```  
+get and save all algorithms as JSON/YAML files in a chosen directory    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|outputDirectory|path/of/your/directory|string|true||  
+|-f, --format|Output format (e.g., json, yaml)  |string||json|  
+#### pipelines  
+  
+```shell  
+$ hkubectl export pipelines < outputDirectory >  
+```  
+get and save all pipelines as JSON/YAML files in a chosen directory    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|outputDirectory|path/of/your/directory|string|true||  
+|-f, --format|Output format (e.g. json, yaml)  |string||json|  
+### import  
+---  
+```shell  
+$ hkubectl import   
+```  
+Import all pipelines to source environment    
+#### all  
+  
+```shell  
+$ hkubectl import all < inputDirectory >  
+```  
+Import your algorithms/pipelines files from a chosen directory to your Hkube
+environment    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|inputDirectory|path/of/your/directory|string|true||  
+|-r, --registry|docker registry for importing algorithms (e.g docker.io, myInternalRegistry)|string|||  
+|--overwrite, --or|Should overwrite exsiting algorithms|boolean|||  
+#### algorithms  
+  
+```shell  
+$ hkubectl import algorithms < inputDirectory >  
+```  
+Import your algorithms from a chosen directory to your Hkube environment    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|inputDirectory|path/of/your/directory|string|true||  
+|-r, --replace|Replace a value like docker registry|(e.g docker.io, myInternalRegistry)|||  
+|--overwrite, --or|Should overwrite exsiting algorithms|boolean|||  
+#### pipelines  
+  
+```shell  
+$ hkubectl import pipelines < inputDirectory >  
+```  
+Import your pipelines from a chosen directory to your Hkube environment    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|inputDirectory|path/of/your/directory|string|true||  
+### import  
+---  
+```shell  
+$ hkubectl import   
+```  
+Import all pipelines to source environment    
+#### all  
+  
+```shell  
+$ hkubectl import all < inputDirectory >  
+```  
+Import your algorithms/pipelines files from a chosen directory to your Hkube
+environment    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|inputDirectory|path/of/your/directory|string|true||  
+|-r, --registry|docker registry for importing algorithms (e.g docker.io, myInternalRegistry)|string|||  
+|--overwrite, --or|Should overwrite exsiting algorithms|boolean|||  
+#### algorithms  
+  
+```shell  
+$ hkubectl import algorithms < inputDirectory >  
+```  
+Import your algorithms from a chosen directory to your Hkube environment    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|inputDirectory|path/of/your/directory|string|true||  
+|-r, --replace|Replace a value like docker registry|(e.g docker.io, myInternalRegistry)|||  
+|--overwrite, --or|Should overwrite exsiting algorithms|boolean|||  
+#### pipelines  
+  
+```shell  
+$ hkubectl import pipelines < inputDirectory >  
+```  
+Import your pipelines from a chosen directory to your Hkube environment    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|inputDirectory|path/of/your/directory|string|true||  
+### import  
+---  
+```shell  
+$ hkubectl import   
+```  
+Import all pipelines to source environment    
+#### all  
+  
+```shell  
+$ hkubectl import all < inputDirectory >  
+```  
+Import your algorithms/pipelines files from a chosen directory to your Hkube
+environment    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|inputDirectory|path/of/your/directory|string|true||  
+|-r, --registry|docker registry for importing algorithms (e.g docker.io, myInternalRegistry)|string|||  
+|--overwrite, --or|Should overwrite exsiting algorithms|boolean|||  
+#### algorithms  
+  
+```shell  
+$ hkubectl import algorithms < inputDirectory >  
+```  
+Import your algorithms from a chosen directory to your Hkube environment    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|inputDirectory|path/of/your/directory|string|true||  
+|-r, --replace|Replace a value like docker registry|(e.g docker.io, myInternalRegistry)|||  
+|--overwrite, --or|Should overwrite exsiting algorithms|boolean|||  
+#### pipelines  
+  
+```shell  
+$ hkubectl import pipelines < inputDirectory >  
+```  
+Import your pipelines from a chosen directory to your Hkube environment    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|inputDirectory|path/of/your/directory|string|true||  
 ### algorithm  
 ---  
 ```shell  
@@ -257,7 +534,7 @@ sync local source folder into algorithm container in the cluster
 ```shell  
 $ hkubectl sync watch   
 ```  
-watch a local folder    
+watch a local folder, navigate menu to apply sync changes at will    
 Options:    
 
   
@@ -282,6 +559,31 @@ Options:
 |--env|algorithm runtime environment  [choices: "python", "nodejs"]|string|||  
 |-e, --entryPoint|the main file of the algorithm|string|||  
 |--baseImage|base image for the algorithm|string|||  
+#### start  
+  
+```shell  
+$ hkubectl sync start   
+```  
+Engage development mode for an algorithm    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|-a, --algorithmName|The name of the algorithm to sync files into  [required]|string|true||  
+|-f, --devFolder|folder in pod to sync to|string|true||  
+#### stop  
+  
+```shell  
+$ hkubectl sync stop   
+```  
+Disengage development mode for an algorithm    
+Options:    
+
+  
+|option|description|type|required|default|  
+|---|---|---|---|---|  
+|-a, --algorithmName|The name of the algorithm to stop syncing files into|string|true||  
 ### config  
 ---  
 ```shell  
@@ -325,4 +627,10 @@ the.dvc files
 ```shell  
 $ hkubectl datasource push   
 ```  
-calls dvc, git push and hkube datasource hkube datasource prepare and sync  
+calls dvc, git push and hkube datasource hkube datasource prepare and sync    
+#### commit  
+  
+```shell  
+$ hkubectl datasource commit   
+```  
+prepares dvc files, commit changes to git and pushes  

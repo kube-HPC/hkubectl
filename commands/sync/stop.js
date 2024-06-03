@@ -18,6 +18,7 @@ const stopHandler = async ({ endpoint, rejectUnauthorized, algorithmName }) => {
         return;
     }
     console.log(`algorithm ${algorithmName} removed from development mode.`);
+    process.exit(0); // release terminal
 };
 module.exports = {
     command: 'stop',
