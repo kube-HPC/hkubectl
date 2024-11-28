@@ -33,7 +33,7 @@
     "@hkube/uid": "^1.0.4",
     "archiver": "^4.0.1",
     "array-flat-polyfill": "^1.0.1",
-    "axios": "^0.19.2",
+    "axios": "^1.7.8",
     "axios-retry": "^3.1.9",
     "chalk": "^4.1.0",
     "cosmiconfig": "^7.0.0",
