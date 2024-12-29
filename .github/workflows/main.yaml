@@ -84,3 +84,9 @@ jobs:
           asset_path: /tmp/checksums.txt
           asset_name: checksums.txt
           asset_content_type: text/plain
+      - name: Trigger Update Files in kube-HPC.github.io
+        run: |
+          curl -X POST https://api.github.com/repos/kube-HPC/kube-HPC.github.io/dispatches \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"event_type": "hkubectl-release"}'
