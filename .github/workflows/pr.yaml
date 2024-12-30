@@ -38,5 +38,5 @@ jobs:
         run: |
           curl -X POST https://api.github.com/repos/kube-HPC/kube-HPC.github.io/dispatches \
             -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
             -d '{"event_type": "hkubectl-release"}'
