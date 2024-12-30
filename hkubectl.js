@@ -74,7 +74,7 @@ const main = async () => {
         .recommendCommands()
         .showHelpOnFail()
         .help()
-        .epilog(chalk.bold('for more information visit http://hkube.io'))
+        .epilog(chalk.bold('for more information visit http://hkube.org'))
         .completion();
 
     yargs.middleware((args) => {
