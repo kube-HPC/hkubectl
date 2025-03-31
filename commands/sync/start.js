@@ -1,7 +1,7 @@
 const { post } = require('../../helpers/request-helper');
 
 const startHandler = async ({ endpoint, rejectUnauthorized, algorithmName, devFolder, $0: appName }) => {
-    // get all parameters, decorate,
+    // get all parameters, decorate
     const body = {
         payload: JSON.stringify({
             name: algorithmName,
