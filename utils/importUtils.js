@@ -2,17 +2,20 @@ const { post } = require('../helpers/request-helper');
 
 async function importAlgorithms(argv, algorithmData, overwrite) {
     const algoPath = 'store/algorithms';
+    console.log(algorithmData);
     const body = {
-        payload: JSON.stringify(algorithmData),
+        payload: algorithmData,
         options: JSON.stringify({
             allowOverwrite: overwrite
         })
     };
+    console.log(body);
     const response = await post({
         ...argv,
         path: algoPath,
         body,
     });
+    console.log(response);
     response.result.forEach((result) => {
         if (result.error) {
             console.error(result.error.message);
