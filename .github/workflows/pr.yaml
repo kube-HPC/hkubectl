@@ -30,8 +30,7 @@ jobs:
         run: |
           sha256sum * > checksums.txt
           sha256sum *
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@23a7e888b88d0db42b452d1cfe8e2553d9642c2d
         with:
           name: output
           path: ./output/
