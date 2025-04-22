@@ -3,16 +3,11 @@ const { post } = require('../../helpers/request-helper');
 const startHandler = async ({ endpoint, rejectUnauthorized, algorithmName, devFolder, $0: appName }) => {
     // get all parameters, decorate
     const body = {
-        payload: JSON.stringify({
-            name: algorithmName,
-            options: {
-                devMode: true,
-                devFolder
-            }
-        }),
-        options: JSON.stringify({
-            allowOverwrite: true
-        })
+        name: algorithmName,
+        options: {
+            devMode: true,
+            devFolder
+        }
     };
     // send update, if doesn't exist, exit.
     const res = await post({ endpoint, rejectUnauthorized, path: 'store/algorithms?overwrite=true', body });

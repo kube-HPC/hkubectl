@@ -49,7 +49,7 @@ async function importAlgorithmData(argv) {
                     ? JSON.parse(fileContent)
                     : yaml.safeLoad(fileContent);
 
-                parsedAlgorithms.push(JSON.stringify(parsedData));
+                parsedAlgorithms.push(parsedData);
             }
             catch (error) {
                 console.error(`Error parsing algorithm file ${file}: ${error.message}`);
