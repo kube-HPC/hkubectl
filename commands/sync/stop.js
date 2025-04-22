@@ -15,7 +15,7 @@ const stopHandler = async ({ endpoint, rejectUnauthorized, algorithmName }) => {
         })
     };
     // send update, if doesn't exist, exit.
-    const res = await post({ endpoint, rejectUnauthorized, path: 'store/algorithms?overwrite=true', body });
+    const res = await post({ endpoint, rejectUnauthorized, path: 'store/algorithms', body });
     if (res.result.error || res.error) {
         let msg;
         msg = res.result.error.message.includes('missing') ? "algorithm doesn't exist" : msg = res.result.error.message;
