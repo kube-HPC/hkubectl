@@ -1,14 +1,18 @@
 const inquirer = require('inquirer');
 const chalk = require('chalk');
+const https = require('https');
+const axios = require('axios');
 const ora = require('ora');
 const commands = require('../commands/config/index.js');
 const { writeValues, resolveConfigPath } = require('../helpers/config');
-const { get } = require('../helpers/request-helper');
+const { get, post } = require('../helpers/request-helper');
 const urlRegex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/;
+const ensureTrailingSlash = (url) => url.replace(/\/?$/, '/');
 
 const handler = async ({ endpoint, rejectUnauthorized, ...rest }) => {
     console.log(chalk.bold('Please answer a few questions to configure Hkube cli'));
-    const answers = await inquirer.prompt([
+    let answers2;
+    const answers1 = await inquirer.prompt([
         {
             type: 'input',
             name: 'endpoint',
@@ -25,11 +29,61 @@ const handler = async ({ endpoint, rejectUnauthorized, ...rest }) => {
             default: rejectUnauthorized
         }
     ]);
+    const kcEndpoint = ensureTrailingSlash(answers1.endpoint);
+    const keycloakUrl = `${kcEndpoint}hkube/keycloak/realms/master/.well-known/openid-configuration`;
+    let keycloakExists = false;
+    try {
+        const kcRes = await axios.get(keycloakUrl, {
+            timeout: 2000,
+            httpsAgent: new https.Agent({
+                rejectUnauthorized: answers1.rejectUnauthorized
+            })
+        });
+        if (kcRes.data) {
+            keycloakExists = true;
+        }
+    }
+    catch (error) {
+        // console.log(chalk.red(`❌ Could not reach Keycloak at ${keycloakUrl}`));
+        // if (error.code === 'ECONNREFUSED') {
+        //     console.log(chalk.red('Connection refused. Is the service up?'));
+        // }
+        // else if (error.response) {
+        //     console.log(chalk.red(`Status code: ${error.response.status}`));
+        // }
+        // else {
+        //     console.log(chalk.red(error.message));
+        // }
+    }
+
+    if (keycloakExists) {
+        answers2 = await inquirer.prompt([
+            {
+                type: 'input',
+                name: 'username',
+                message: 'Enter your keycloak username',
+            },
+            {
+                type: 'password',
+                name: 'password',
+                message: 'Enter your keycloak password',
+                mask: '*'
+            }
+        ]);
+    }
+    const answers = { ...answers1, ...answers2 };
     await writeValues(answers);
     // const answers = { endpoint, rejectUnauthorized };
     console.log(`Values saved in ${await resolveConfigPath()}`);
+    let res = await post({ endpoint: answers.endpoint, rejectUnauthorized: answers.rejectUnauthorized, path: '/auth/login', body: { username: answers.username, password: answers.password } });
+    if (!res || !res.result) {
+        if (res.error.message) {
+            console.log(chalk.red(`Login failed - ${res.error.message}`));
+        }
+        return;
+    }
     const spinner = ora({ text: 'Validating config...', spinner: 'line' }).start();
-    const res = await get({ ...answers, path: '/storage/info', timeout: 1000 });
+    res = await get({ ...answers, path: '/storage/info', timeout: 1000, headers: { Authorization: `Bearer ${res.result.token}` } });
     if (!res || !res.result) {
         spinner.fail();
         console.error(chalk`{red failed} to connect to api-server at ${answers.endpoint}`);
