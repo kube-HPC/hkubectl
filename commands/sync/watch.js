@@ -74,7 +74,7 @@ const startMenu = (printMenu = false) => {
     });
 };
 
-const watchHandler = async ({ endpoint, rejectUnauthorized, algorithmName, folder, bidi }) => {
+const watchHandler = async ({ endpoint, rejectUnauthorized, username, password, algorithmName, folder, bidi }) => {
     this._endpoint = endpoint;
     const endpointParts = endpoint.match(/(https?:\/\/)(.*)/);
     const [, urlPrefix, baseUrl] = endpointParts;
@@ -82,7 +82,8 @@ const watchHandler = async ({ endpoint, rejectUnauthorized, algorithmName, folde
     this._algorithmName = algorithmName;
     this.body = { ...this.body, payload: { name: algorithmName } };
     this.body = { ...this.body, options: { forceUpdate: true } };
-    const res = await get({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `store/algorithms/${algorithmName}` });
+    let res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
+    res = await get({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `store/algorithms/${algorithmName}`, headers: { Authorization: `Bearer ${res.result.token}` } });
     if (res.error && res.error.message) {
         console.error(`error getting algorithm ${algorithmName}. Error: ${res.error.message}`);
         return;

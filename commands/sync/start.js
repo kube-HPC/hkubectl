@@ -1,6 +1,6 @@
 const { post } = require('../../helpers/request-helper');
 
-const startHandler = async ({ endpoint, rejectUnauthorized, algorithmName, devFolder, $0: appName }) => {
+const startHandler = async ({ endpoint, rejectUnauthorized, username, password, algorithmName, devFolder, $0: appName }) => {
     // get all parameters, decorate
     const body = {
         name: algorithmName,
@@ -9,8 +9,8 @@ const startHandler = async ({ endpoint, rejectUnauthorized, algorithmName, devFo
             devFolder
         }
     };
-    // send update, if doesn't exist, exit.
-    const res = await post({ endpoint, rejectUnauthorized, path: 'store/algorithms?overwrite=true', body });
+    let res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
+    res = await post({ endpoint, rejectUnauthorized, path: 'store/algorithms?overwrite=true', body, headers: { Authorization: `Bearer ${res.result.token}` } });
     if (res.result.error || res.error) {
         let msg;
         msg = res.result.error.message.includes('missing') ? "algorithm doesn't exist" : msg = res.result.error.message;

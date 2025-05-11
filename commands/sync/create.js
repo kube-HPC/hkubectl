@@ -2,8 +2,9 @@ const path = require('path');
 const { handleApply } = require('../store/algorithms/applyImpl');
 const { buildDoneEvents } = require('../../helpers/consts');
 const { askMissingValues } = require('../../helpers/input');
+// const { post } = require('../../helpers/request-helper');
 
-const createHandler = async ({ endpoint, rejectUnauthorized, algorithmName, folder, entryPoint, env, baseImage, $0: appName }) => {
+const createHandler = async ({ endpoint, rejectUnauthorized, username, password, algorithmName, folder, entryPoint, env, baseImage, $0: appName }) => {
     try {
         const fullFolderPath = path.resolve(folder);
         const algorithmData = {
@@ -15,8 +16,9 @@ const createHandler = async ({ endpoint, rejectUnauthorized, algorithmName, fold
             env,
             baseImage
         };
+
         const { buildStatus } = await handleApply({
-            endpoint, rejectUnauthorized, name: algorithmName, wait: true, forceVersion: true, ...algorithmData
+            endpoint, rejectUnauthorized, username, password, name: algorithmName, wait: true, forceVersion: true, ...algorithmData
         });
         if (buildStatus === buildDoneEvents.completed) {
             console.log(`algorithm ${algorithmName} is ready`);

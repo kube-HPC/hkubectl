@@ -44,16 +44,7 @@ const handler = async ({ endpoint, rejectUnauthorized, ...rest }) => {
         }
     }
     catch (error) {
-        // console.log(chalk.red(`❌ Could not reach Keycloak at ${keycloakUrl}`));
-        // if (error.code === 'ECONNREFUSED') {
-        //     console.log(chalk.red('Connection refused. Is the service up?'));
-        // }
-        // else if (error.response) {
-        //     console.log(chalk.red(`Status code: ${error.response.status}`));
-        // }
-        // else {
-        //     console.log(chalk.red(error.message));
-        // }
+        // Keycloak doesnt exist, flag stays false.
     }
 
     if (keycloakExists) {
