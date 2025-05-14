@@ -12,7 +12,8 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, username, password, 
         const spinner = ora({ text: `execution ${jobId} in progress.`, spinner: 'line' }).start();
         let lastStatus = '';
         let lastProgress = '';
-        const statusResult = await getUntil({ endpoint, rejectUnauthorized, username, password, path: `exec/status/${jobId}` }, (res) => {
+        const result = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
+        const statusResult = await getUntil({ endpoint, rejectUnauthorized, username, password, path: `exec/status/${jobId}`, headers: { Authorization: `Bearer ${result.result.token}` } }, (res) => {
             const currentStatus = objectPath.get(res, 'result.status', '');
             const currentProgress = objectPath.get(res, 'result.data.details', '');
             if (lastStatus !== currentStatus || lastProgress !== currentProgress) {
@@ -33,8 +34,7 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, username, password, 
             spinner.succeed();
             return { jobId, jobStatus };
         }
-        const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
-        const executionResult = await get({ endpoint, rejectUnauthorized, path: `exec/results/${jobId}`, headers: { Authorization: `Bearer ${res.result.token}` }
+        const executionResult = await get({ endpoint, rejectUnauthorized, path: `exec/results/${jobId}`, headers: { Authorization: `Bearer ${result.result.token}` }
         });
         if (executionResult.error) {
             spinner.fail();

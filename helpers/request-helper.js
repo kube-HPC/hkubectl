@@ -70,7 +70,7 @@ const getUntil = async (getOptions, condition, timeout = 20000) => {
         }
         let res = await post({ endpoint: getOptionsNoCredentials.endpoint, rejectUnauthorized: getOptionsNoCredentials.rejectUnauthorized, path: '/auth/login', body: { username, password } });
         getOptionsNoCredentials.headers = { Authorization: `Bearer ${res.result.token}` };
-        res = await get(getOptions);
+        res = await get(getOptionsNoCredentials);
         const conditionResult = condition(res);
         if (conditionResult) {
             return res;
