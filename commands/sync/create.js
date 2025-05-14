@@ -2,7 +2,6 @@ const path = require('path');
 const { handleApply } = require('../store/algorithms/applyImpl');
 const { buildDoneEvents } = require('../../helpers/consts');
 const { askMissingValues } = require('../../helpers/input');
-// const { post } = require('../../helpers/request-helper');
 
 const createHandler = async ({ endpoint, rejectUnauthorized, username, password, algorithmName, folder, entryPoint, env, baseImage, $0: appName }) => {
     try {

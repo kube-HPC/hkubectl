@@ -48,15 +48,19 @@ const startMenu = (printMenu = false) => {
     }
 
     rl.question('', (answer) => {
-        switch (answer) {
-        case '1':
-            printScrollingLine('Pressed 1, restarting pods, update in progress...', false, false, false);
-            del({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `kubernetes/algorithms/pods/${this._algorithmName}` });
+        const awaitCase1 = async () => {
+            const res = await post({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: '/auth/login', body: { username: this._username, password: this._password } });
+            del({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `kubernetes/algorithms/pods/${this._algorithmName}`, headers: { Authorization: `Bearer ${res.result.token}` } });
             this.body.payload = { ...this.body.payload, syncTimeStamp: new Date().toLocaleTimeString() };
             this.body.options = JSON.stringify(this.body.options);
             this.body.payload = JSON.stringify(this.body.payload);
-            post({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: 'store/algorithms/apply', body: this.body });
+            post({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: 'store/algorithms/apply', body: this.body, headers: { Authorization: `Bearer ${res.result.token}` } });
             startMenu(true);
+        };
+        switch (answer) {
+        case '1':
+            printScrollingLine('Pressed 1, restarting pods, update in progress...', false, false, false);
+            awaitCase1();
             break;
         case '2':
             process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
@@ -76,6 +80,8 @@ const startMenu = (printMenu = false) => {
 
 const watchHandler = async ({ endpoint, rejectUnauthorized, username, password, algorithmName, folder, bidi }) => {
     this._endpoint = endpoint;
+    this._username = username;
+    this._password = password;
     const endpointParts = endpoint.match(/(https?:\/\/)(.*)/);
     const [, urlPrefix, baseUrl] = endpointParts;
     this._rejectUnauthorized = rejectUnauthorized;
@@ -83,6 +89,7 @@ const watchHandler = async ({ endpoint, rejectUnauthorized, username, password, 
     this.body = { ...this.body, payload: { name: algorithmName } };
     this.body = { ...this.body, options: { forceUpdate: true } };
     let res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
+    this._token = res.result.token;
     res = await get({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `store/algorithms/${algorithmName}`, headers: { Authorization: `Bearer ${res.result.token}` } });
     if (res.error && res.error.message) {
         console.error(`error getting algorithm ${algorithmName}. Error: ${res.error.message}`);

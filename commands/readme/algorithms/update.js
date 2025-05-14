@@ -1,8 +1,8 @@
 const fse = require('fs-extra');
 const { log } = require('../../../helpers/output');
-const { putFile } = require('../../../helpers/request-helper');
+const { putFile, post } = require('../../../helpers/request-helper');
 
-const handleUpdate = async (readmeFile, endpoint, rejectUnauthorized, name) => {
+const handleUpdate = async (readmeFile, endpoint, username, password, rejectUnauthorized, name) => {
     const path = `readme/algorithms/${name}`;
     const stream = fse.createReadStream(readmeFile);
     const formData = {
@@ -13,11 +13,13 @@ const handleUpdate = async (readmeFile, endpoint, rejectUnauthorized, name) => {
             }
         }
     };
+    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
     const result = await putFile({
         endpoint,
         rejectUnauthorized,
         formData,
-        path
+        path,
+        headers: { Authorization: `Bearer ${res.result.token}` }
     });
     return result;
 };

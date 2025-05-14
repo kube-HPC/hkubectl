@@ -5,7 +5,7 @@ const { post } = require('../../helpers/request-helper');
 const { waitForBuild } = require('../../helpers/results');
 const path = 'exec/algorithm/';
 
-const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait, noResult }) => {
+const executeHandler = async ({ endpoint, rejectUnauthorized, username, password, name, file, noWait, noResult }) => {
     let loadResult;
 
     if (file) {
@@ -14,11 +14,13 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait
     const body = {
         name, ...loadResult
     };
+    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
     const execResult = await post({
         endpoint,
         rejectUnauthorized,
         path,
-        body
+        body,
+        headers: { Authorization: `Bearer ${res.result.token}` }
     });
     if (execResult.error) {
         return execResult.error;
@@ -26,7 +28,7 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait
     if (noWait) {
         return execResult.result;
     }
-    return waitForBuild({ endpoint, rejectUnauthorized, execResult: execResult.result, noResult });
+    return waitForBuild({ endpoint, rejectUnauthorized, username, password, execResult: execResult.result, noResult });
 };
 
 module.exports = {

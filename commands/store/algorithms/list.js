@@ -1,11 +1,14 @@
-const { get } = require('../../../helpers/request-helper');
+const { get, post } = require('../../../helpers/request-helper');
 const { log } = require('../../../helpers/output');
 
 const list = async (argv) => {
     const path = 'store/algorithms';
+    const { endpoint, rejectUnauthorized, username, password } = argv;
+    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
     const algorithms = await get({
         ...argv,
-        path
+        path,
+        headers: { Authorization: `Bearer ${res.result.token}` }
     });
     if (!algorithms || !algorithms.result) {
         return algorithms;

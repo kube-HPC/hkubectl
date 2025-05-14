@@ -1,9 +1,9 @@
 const prettyjson = require('prettyjson');
 const fse = require('fs-extra');
 const FormData = require('form-data');
-const { postFile } = require('../../../helpers/request-helper');
+const { postFile, post } = require('../../../helpers/request-helper');
 
-const handleAdd = async ({ endpoint, rejectUnauthorized, name, readmeFile }) => {
+const handleAdd = async ({ endpoint, rejectUnauthorized, username, password, name, readmeFile }) => {
     const path = `readme/algorithms/${name}`;
     const stream = fse.createReadStream(readmeFile);
     const formData = new FormData();
@@ -13,11 +13,13 @@ const handleAdd = async ({ endpoint, rejectUnauthorized, name, readmeFile }) => 
             filename: 'README.md'
         }
     });
+    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
     const result = await postFile({
         endpoint,
         rejectUnauthorized,
         formData,
-        path
+        path,
+        headers: { Authorization: `Bearer ${res.result.token}` }
     });
     return result;
 };

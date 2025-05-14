@@ -7,7 +7,7 @@ const { waitForBuild } = require('../../helpers/results');
 
 const path = 'exec/raw/';
 
-const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait, noResult }) => {
+const executeHandler = async ({ endpoint, rejectUnauthorized, username, password, name, file, noWait, noResult }) => {
     let result;
     if (file === '-') {
         result = yaml.safeLoad(await getStdin());
@@ -18,11 +18,13 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait
     const body = {
         name, ...result
     };
+    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
     const execResult = await post({
         endpoint,
         rejectUnauthorized,
         path,
-        body
+        body,
+        headers: { Authorization: `Bearer ${res.result.token}` }
     });
 
     if (execResult.error) {
@@ -31,7 +33,7 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, name, file, noWait
     if (noWait) {
         return execResult.result;
     }
-    return waitForBuild({ endpoint, rejectUnauthorized, execResult: execResult.result, noResult });
+    return waitForBuild({ endpoint, rejectUnauthorized, username, password, execResult: execResult.result, noResult });
 };
 
 module.exports = {

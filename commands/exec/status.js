@@ -1,12 +1,14 @@
 const { log } = require('../../helpers/output');
-const { get } = require('../../helpers/request-helper');
+const { get, post } = require('../../helpers/request-helper');
 
-const executeHandler = async ({ endpoint, rejectUnauthorized, jobId }) => {
+const executeHandler = async ({ endpoint, rejectUnauthorized, username, password, jobId }) => {
     const path = `exec/status/${jobId}`;
+    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
     return get({
         endpoint,
         rejectUnauthorized,
-        path
+        path,
+        headers: { Authorization: `Bearer ${res.result.token}` }
     });
 };
 

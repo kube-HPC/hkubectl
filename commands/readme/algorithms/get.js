@@ -1,12 +1,14 @@
-const { get } = require('../../../helpers/request-helper');
+const { get, post } = require('../../../helpers/request-helper');
 const { log } = require('../../../helpers/output');
 
-const getHandler = async ({ endpoint, rejectUnauthorized, name }) => {
+const getHandler = async ({ endpoint, rejectUnauthorized, username, password, name }) => {
     const path = `store/algorithms/${name || ''}`;
+    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
     return get({
         endpoint,
         rejectUnauthorized,
-        path
+        path,
+        headers: { Authorization: `Bearer ${res.result.token}` }
     });
 };
 

@@ -46,8 +46,8 @@ const _request = async ({ endpoint, rejectUnauthorized, path, method, body, form
     return { error, result: result && result.data };
 };
 
-const del = async ({ endpoint, rejectUnauthorized, path, qs }) => {
-    return _request({ endpoint, rejectUnauthorized, path, qs, method: 'DELETE' });
+const del = async ({ endpoint, rejectUnauthorized, path, qs, headers }) => {
+    return _request({ endpoint, rejectUnauthorized, path, qs, method: 'DELETE', headers });
 };
 
 const get = async ({ endpoint, rejectUnauthorized, path, qs, timeout, headers }) => {
