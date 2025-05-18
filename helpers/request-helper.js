@@ -62,15 +62,15 @@ const getUntil = async (getOptions, condition, timeout = 20000) => {
     if (!condition) {
         return { error: 'condition function not specified' };
     }
-    const { username, password, ...getOptionsNoCredentials } = getOptions;
+    const { auth, ...getOptionsNoCredentials } = getOptions;
     const startTime = Date.now();
     while (true) {
         if (Date.now() - startTime > timeout) {
             return { error: 'time out waiting for condition' };
         }
-        let res = await post({ endpoint: getOptionsNoCredentials.endpoint, rejectUnauthorized: getOptionsNoCredentials.rejectUnauthorized, path: '/auth/login', body: { username, password } });
-        getOptionsNoCredentials.headers = { Authorization: `Bearer ${res.result.token}` };
-        res = await get(getOptionsNoCredentials);
+        this._kc_token = await auth.getToken();
+        getOptionsNoCredentials.headers = { Authorization: `Bearer ${this._kc_token}` };
+        const res = await get(getOptionsNoCredentials);
         const conditionResult = condition(res);
         if (conditionResult) {
             return res;

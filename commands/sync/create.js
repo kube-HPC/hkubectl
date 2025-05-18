@@ -15,7 +15,7 @@ const createHandler = async ({ endpoint, rejectUnauthorized, username, password,
             env,
             baseImage
         };
-
+        console.log('calling handleApply from create'); // logs for e2e
         const { buildStatus } = await handleApply({
             endpoint, rejectUnauthorized, username, password, name: algorithmName, wait: true, forceVersion: true, ...algorithmData
         });
@@ -23,10 +23,12 @@ const createHandler = async ({ endpoint, rejectUnauthorized, username, password,
             console.log(`algorithm ${algorithmName} is ready`);
             console.log('to sync the folder to the algorithm run');
             console.log(`${appName} sync watch -a ${algorithmName} -f ${folder}`);
+            process.exit(0); // release terminal
         }
     }
     catch (error) {
         console.error(`error Creating algorithm. Error: ${error.message}`);
+        process.exit(0); // release terminal
     }
 };
 module.exports = {

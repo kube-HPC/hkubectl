@@ -8,6 +8,7 @@ const syncthing = require('../../helpers/syncthing/syncthing.js');
 const { events } = require('../../helpers/consts');
 const { lock } = require('../../helpers/locks');
 const { post, get, del } = require('../../helpers/request-helper');
+const { AuthManager } = require('../../helpers/authentication/auth-manager');
 
 const cursorUpCleanLine = '\x1b[1A\x1b[2K';
 // eslint-disable-next-line no-unused-vars
@@ -49,12 +50,13 @@ const startMenu = (printMenu = false) => {
 
     rl.question('', (answer) => {
         const awaitCase1 = async () => {
-            const res = await post({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: '/auth/login', body: { username: this._username, password: this._password } });
-            del({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `kubernetes/algorithms/pods/${this._algorithmName}`, headers: { Authorization: `Bearer ${res.result.token}` } });
+            // const res = await post({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: '/auth/login', body: { username: this._username, password: this._password } });
+            this._kc_token = await this._auth.getToken();
+            del({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `kubernetes/algorithms/pods/${this._algorithmName}`, headers: { Authorization: `Bearer ${this._kc_token}` } });
             this.body.payload = { ...this.body.payload, syncTimeStamp: new Date().toLocaleTimeString() };
             this.body.options = JSON.stringify(this.body.options);
             this.body.payload = JSON.stringify(this.body.payload);
-            post({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: 'store/algorithms/apply', body: this.body, headers: { Authorization: `Bearer ${res.result.token}` } });
+            post({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: 'store/algorithms/apply', body: this.body, headers: { Authorization: `Bearer ${this._kc_token}` } });
             startMenu(true);
         };
         switch (answer) {
@@ -79,6 +81,15 @@ const startMenu = (printMenu = false) => {
 };
 
 const watchHandler = async ({ endpoint, rejectUnauthorized, username, password, algorithmName, folder, bidi }) => {
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
+    this._auth = auth;
+    this._kc_token = await auth.getToken();
     this._endpoint = endpoint;
     this._username = username;
     this._password = password;
@@ -88,9 +99,9 @@ const watchHandler = async ({ endpoint, rejectUnauthorized, username, password, 
     this._algorithmName = algorithmName;
     this.body = { ...this.body, payload: { name: algorithmName } };
     this.body = { ...this.body, options: { forceUpdate: true } };
-    let res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
-    this._token = res.result.token;
-    res = await get({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `store/algorithms/${algorithmName}`, headers: { Authorization: `Bearer ${res.result.token}` } });
+    // let res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
+    // this._token = res.result.token;
+    const res = await get({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `store/algorithms/${algorithmName}`, headers: { Authorization: `Bearer ${this._kc_token}` } });
     if (res.error && res.error.message) {
         console.error(`error getting algorithm ${algorithmName}. Error: ${res.error.message}`);
         return;
