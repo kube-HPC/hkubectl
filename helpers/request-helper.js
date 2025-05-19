@@ -20,7 +20,7 @@ const uriBuilder = ({ endpoint, path, qs = {} }) => {
     return url.toString();
 };
 
-const _request = async ({ endpoint, rejectUnauthorized, path, method, body, formData, qs, timeout }) => {
+const _request = async ({ endpoint, rejectUnauthorized, path, method, body, formData, qs, timeout, headers = {} }) => {
     const url = uriBuilder({ endpoint, path, qs });
     let result;
     let error;
@@ -31,7 +31,10 @@ const _request = async ({ endpoint, rejectUnauthorized, path, method, body, form
             httpsAgent: https.Agent({ rejectUnauthorized }),
             json: true,
             data: body || formData,
-            headers: formData ? formData.getHeaders() : {},
+            headers: {
+                ...headers,
+                ...(formData ? formData.getHeaders() : {})
+            },
             timeout,
             maxBodyLength: 1e15,
             maxContentLength: 1e15
@@ -43,24 +46,31 @@ const _request = async ({ endpoint, rejectUnauthorized, path, method, body, form
     return { error, result: result && result.data };
 };
 
-const del = async ({ endpoint, rejectUnauthorized, path, qs }) => {
-    return _request({ endpoint, rejectUnauthorized, path, qs, method: 'DELETE' });
+const del = async ({ endpoint, rejectUnauthorized, path, qs, headers }) => {
+    return _request({ endpoint, rejectUnauthorized, path, qs, method: 'DELETE', headers });
 };
 
-const get = async ({ endpoint, rejectUnauthorized, path, qs, timeout }) => {
-    return _request({ endpoint, rejectUnauthorized, path, qs, method: 'GET', timeout });
+const get = async ({ endpoint, rejectUnauthorized, path, qs, timeout, headers }) => {
+    return _request({ endpoint, rejectUnauthorized, path, qs, method: 'GET', timeout, headers });
+};
+
+const post = async ({ endpoint, rejectUnauthorized, path, qs, body, headers }) => {
+    return _request({ endpoint, rejectUnauthorized, path, qs, body, method: 'POST', headers });
 };
 
 const getUntil = async (getOptions, condition, timeout = 20000) => {
     if (!condition) {
         return { error: 'condition function not specified' };
     }
+    const { auth, ...getOptionsNoCredentials } = getOptions;
     const startTime = Date.now();
     while (true) {
         if (Date.now() - startTime > timeout) {
             return { error: 'time out waiting for condition' };
         }
-        const res = await get(getOptions);
+        this._kc_token = await auth.getToken();
+        getOptionsNoCredentials.headers = { Authorization: `Bearer ${this._kc_token}` };
+        const res = await get(getOptionsNoCredentials);
         const conditionResult = condition(res);
         if (conditionResult) {
             return res;
@@ -68,12 +78,9 @@ const getUntil = async (getOptions, condition, timeout = 20000) => {
         await sleep(1000);
     }
 };
-const post = async ({ endpoint, rejectUnauthorized, path, qs, body }) => {
-    return _request({ endpoint, rejectUnauthorized, path, qs, body, method: 'POST' });
-};
 
-const postFile = async ({ endpoint, rejectUnauthorized, path, qs, formData }) => {
-    return _request({ endpoint, rejectUnauthorized, path, qs, formData, method: 'POST' });
+const postFile = async ({ endpoint, rejectUnauthorized, path, qs, formData, headers }) => {
+    return _request({ endpoint, rejectUnauthorized, path, qs, formData, method: 'POST', headers });
 };
 
 const put = async ({ endpoint, rejectUnauthorized, path, qs, body }) => {

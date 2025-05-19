@@ -1,12 +1,22 @@
-const { del } = require('../../../helpers/request-helper');
+const { del, } = require('../../../helpers/request-helper');
 const { log } = require('../../../helpers/output');
+const { AuthManager } = require('../../../helpers/authentication/auth-manager');
 
-const delHandler = async ({ endpoint, rejectUnauthorized, name }) => {
+const delHandler = async ({ endpoint, rejectUnauthorized, username, password, name }) => {
     const path = `store/algorithms/${name}`;
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
+    this._kc_token = await auth.getToken();
     return del({
         endpoint,
         rejectUnauthorized,
-        path
+        path,
+        headers: { Authorization: `Bearer ${this._kc_token}` }
     });
 };
 
