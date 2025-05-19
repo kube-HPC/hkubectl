@@ -3,7 +3,7 @@ const fse = require('fs-extra');
 const { log } = require('../../helpers/output');
 const { post } = require('../../helpers/request-helper');
 const { waitForBuild } = require('../../helpers/results');
-
+const { AuthManager } = require('../../helpers/authentication/auth-manager');
 const path = 'exec/stored/';
 
 const executeHandler = async ({ endpoint, rejectUnauthorized, username, password, name, noWait, noResult, file }) => {
@@ -15,13 +15,20 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, username, password
     const body = {
         name, ...result
     };
-    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
+    this._kc_token = await auth.getToken();
     const execResult = await post({
         endpoint,
         rejectUnauthorized,
         path,
         body,
-        headers: { Authorization: `Bearer ${res.result.token}` }
+        headers: { Authorization: `Bearer ${this._kc_token}` }
     });
     if (execResult.error) {
         return execResult.error;
@@ -29,7 +36,7 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, username, password
     if (noWait) {
         return execResult.result;
     }
-    return waitForBuild({ endpoint, rejectUnauthorized, username, password, execResult: execResult.result, noResult });
+    return waitForBuild({ endpoint, rejectUnauthorized, username, password, execResult: execResult.result, noResult, auth });
 };
 
 module.exports = {

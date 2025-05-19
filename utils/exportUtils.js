@@ -1,13 +1,21 @@
-const { get, post } = require('../helpers/request-helper');
+const { get, } = require('../helpers/request-helper');
+const { AuthManager } = require('../helpers/authentication/auth-manager');
 
 async function getAlgorithms(argv) {
     const { endpoint, rejectUnauthorized, username, password } = argv;
-    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
+    this._kc_token = await auth.getToken();
     const algoPath = 'store/algorithms';
     const algorithms = await get({
         ...argv,
         path: algoPath,
-        headers: { Authorization: `Bearer ${res.result.token}` }
+        headers: { Authorization: `Bearer ${this._kc_token}` }
     });
     if (!algorithms || !algorithms.result) {
         return algorithms;
@@ -17,12 +25,19 @@ async function getAlgorithms(argv) {
 
 async function getPipelines(argv) {
     const { endpoint, rejectUnauthorized, username, password } = argv;
-    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
+    this._kc_token = await auth.getToken();
     const pipelinePath = 'store/pipelines';
     const pipelines = await get({
         ...argv,
         path: pipelinePath,
-        headers: { Authorization: `Bearer ${res.result.token}` }
+        headers: { Authorization: `Bearer ${this._kc_token}` }
     });
     if (!pipelines || !pipelines.result) {
         return pipelines;

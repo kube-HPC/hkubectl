@@ -1,5 +1,6 @@
 const { log } = require('../../helpers/output');
 const { post } = require('../../helpers/request-helper');
+const { AuthManager } = require('../../helpers/authentication/auth-manager');
 const path = 'exec/stop/';
 
 const executeHandler = async ({ endpoint, rejectUnauthorized, username, password, jobId, reason }) => {
@@ -7,13 +8,20 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, username, password
         jobId,
         reason
     };
-    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
+    this._kc_token = await auth.getToken();
     return post({
         endpoint,
         rejectUnauthorized,
         path,
         body,
-        headers: { Authorization: `Bearer ${res.result.token}` }
+        headers: { Authorization: `Bearer ${this._kc_token}` }
     });
 };
 

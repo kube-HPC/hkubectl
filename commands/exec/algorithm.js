@@ -3,24 +3,31 @@ const fse = require('fs-extra');
 const { log } = require('../../helpers/output');
 const { post } = require('../../helpers/request-helper');
 const { waitForBuild } = require('../../helpers/results');
+const { AuthManager } = require('../../helpers/authentication/auth-manager');
 const path = 'exec/algorithm/';
 
 const executeHandler = async ({ endpoint, rejectUnauthorized, username, password, name, file, noWait, noResult }) => {
     let loadResult;
-
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
+    this._kc_token = await auth.getToken();
     if (file) {
         loadResult = yaml.safeLoad(fse.readFileSync(file, 'utf8'));
     }
     const body = {
         name, ...loadResult
     };
-    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
     const execResult = await post({
         endpoint,
         rejectUnauthorized,
         path,
         body,
-        headers: { Authorization: `Bearer ${res.result.token}` }
+        headers: { Authorization: `Bearer ${this._kc_token}` }
     });
     if (execResult.error) {
         return execResult.error;

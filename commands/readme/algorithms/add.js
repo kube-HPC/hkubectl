@@ -1,7 +1,8 @@
 const prettyjson = require('prettyjson');
 const fse = require('fs-extra');
 const FormData = require('form-data');
-const { postFile, post } = require('../../../helpers/request-helper');
+const { postFile } = require('../../../helpers/request-helper');
+const { AuthManager } = require('../../../helpers/authentication/auth-manager');
 
 const handleAdd = async ({ endpoint, rejectUnauthorized, username, password, name, readmeFile }) => {
     const path = `readme/algorithms/${name}`;
@@ -13,13 +14,21 @@ const handleAdd = async ({ endpoint, rejectUnauthorized, username, password, nam
             filename: 'README.md'
         }
     });
-    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
+    this._kc_token = await auth.getToken();
+
     const result = await postFile({
         endpoint,
         rejectUnauthorized,
         formData,
         path,
-        headers: { Authorization: `Bearer ${res.result.token}` }
+        headers: { Authorization: `Bearer ${this._kc_token}` }
     });
     return result;
 };

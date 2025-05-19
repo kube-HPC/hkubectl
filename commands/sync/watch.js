@@ -99,8 +99,6 @@ const watchHandler = async ({ endpoint, rejectUnauthorized, username, password, 
     this._algorithmName = algorithmName;
     this.body = { ...this.body, payload: { name: algorithmName } };
     this.body = { ...this.body, options: { forceUpdate: true } };
-    // let res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
-    // this._token = res.result.token;
     const res = await get({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `store/algorithms/${algorithmName}`, headers: { Authorization: `Bearer ${this._kc_token}` } });
     if (res.error && res.error.message) {
         console.error(`error getting algorithm ${algorithmName}. Error: ${res.error.message}`);

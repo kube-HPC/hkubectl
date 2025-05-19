@@ -74,7 +74,7 @@ const handler = async ({ endpoint, rejectUnauthorized, ...rest }) => {
         return;
     }
     const spinner = ora({ text: 'Validating config...', spinner: 'line' }).start();
-    res = await get({ ...answers, path: '/storage/info', timeout: 1000, headers: { Authorization: `Bearer ${res.result.token}` } });
+    res = await get({ ...answers, path: '/storage/info', timeout: 1000, headers: { Authorization: `Bearer ${res.result.data.access_token}` } });
     if (!res || !res.result) {
         spinner.fail();
         console.error(chalk`{red failed} to connect to api-server at ${answers.endpoint}`);

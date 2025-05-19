@@ -1,14 +1,22 @@
-const { get, post } = require('../../../helpers/request-helper');
+const { get } = require('../../../helpers/request-helper');
 const { log } = require('../../../helpers/output');
+const { AuthManager } = require('../../../helpers/authentication/auth-manager');
 
 const getHandler = async ({ endpoint, rejectUnauthorized, username, password, name }) => {
     const path = `store/algorithms/${name || ''}`;
-    const res = await post({ endpoint, rejectUnauthorized, path: '/auth/login', body: { username, password } });
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
+    this._kc_token = await auth.getToken();
     return get({
         endpoint,
         rejectUnauthorized,
         path,
-        headers: { Authorization: `Bearer ${res.result.token}` }
+        headers: { Authorization: `Bearer ${this._kc_token}` }
     });
 };
 
