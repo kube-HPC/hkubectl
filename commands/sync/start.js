@@ -24,12 +24,13 @@ const startHandler = async ({ endpoint, rejectUnauthorized, username, password, 
         let msg;
         msg = res.result.error.message.includes('missing') ? "algorithm doesn't exist" : msg = res.result.error.message;
         console.log(`code: ${res.result.error.code}, message: ${msg}`);
+        auth.stop();
         return;
     }
     console.log(`algorithm ${algorithmName} modified to be in development mode with the synced path being ${devFolder}.`);
     console.log('to sync the folder to the algorithm run:');
     console.log(`${appName} sync watch -a ${algorithmName} -f <localAlgoFolder>`);
-    process.exit(0); // release terminal
+    auth.stop();
 };
 module.exports = {
     command: 'start',

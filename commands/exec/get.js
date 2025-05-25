@@ -12,12 +12,14 @@ const getHandler = async ({ endpoint, rejectUnauthorized, username, password, jo
     });
     await auth.init();
     this._kc_token = await auth.getToken();
-    return get({
+    const result = await get({
         endpoint,
         rejectUnauthorized,
         path,
         headers: { Authorization: `Bearer ${this._kc_token}` }
     });
+    auth.stop();
+    return result;
 };
 
 module.exports = {

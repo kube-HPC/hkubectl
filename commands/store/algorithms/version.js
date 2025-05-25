@@ -26,6 +26,7 @@ const getHandler = async ({ endpoint, rejectUnauthorized, username, password, na
             headers: { Authorization: `Bearer ${this._kc_token}` }
         });
         if (verbose) {
+            auth.stop();
             return ret;
         }
         return ret.error ? ret.error : { version: ret.result.algorithmImage };
@@ -38,9 +39,12 @@ const getHandler = async ({ endpoint, rejectUnauthorized, username, password, na
         headers: { Authorization: `Bearer ${this._kc_token}` }
     });
     if (verbose) {
+        auth.stop();
         return ret;
     }
-    return { name, versions: ret.result.map(r => r.algorithmImage) };
+    const result = { name, versions: ret.result.map(r => r.algorithmImage) };
+    auth.stop();
+    return result;
 };
 
 module.exports = {

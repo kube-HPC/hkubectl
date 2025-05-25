@@ -30,6 +30,7 @@ const handleAdd = async ({ endpoint, rejectUnauthorized, username, password, nam
         path,
         headers: { Authorization: `Bearer ${this._kc_token}` }
     });
+    auth.stop();
     return result;
 };
 

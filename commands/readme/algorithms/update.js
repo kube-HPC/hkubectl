@@ -29,6 +29,7 @@ const handleUpdate = async (readmeFile, endpoint, username, password, rejectUnau
         path,
         headers: { Authorization: `Bearer ${this._kc_token}` }
     });
+    auth.stop();
     return result;
 };
 

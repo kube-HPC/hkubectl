@@ -19,9 +19,12 @@ const list = async (argv) => {
         headers: { Authorization: `Bearer ${this._kc_token}` }
     });
     if (!algorithms || !algorithms.result) {
+        auth.stop();
         return algorithms;
     }
-    return algorithms.result.map(a => a.name);
+    const result = algorithms.result.map(a => a.name);
+    auth.stop();
+    return result;
 };
 
 module.exports = {

@@ -12,12 +12,14 @@ const delHandler = async ({ endpoint, rejectUnauthorized, username, password, na
     });
     await auth.init();
     this._kc_token = await auth.getToken();
-    return del({
+    const result = await del({
         endpoint,
         rejectUnauthorized,
         path,
         headers: { Authorization: `Bearer ${this._kc_token}` }
     });
+    auth.stop();
+    return result;
 };
 
 module.exports = {

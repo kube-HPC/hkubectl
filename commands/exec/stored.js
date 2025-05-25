@@ -31,12 +31,16 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, username, password
         headers: { Authorization: `Bearer ${this._kc_token}` }
     });
     if (execResult.error) {
+        auth.stop();
         return execResult.error;
     }
     if (noWait) {
+        auth.stop();
         return execResult.result;
     }
-    return waitForBuild({ endpoint, rejectUnauthorized, username, password, execResult: execResult.result, noResult, auth });
+    auth.stop();
+    result = await waitForBuild({ endpoint, rejectUnauthorized, username, password, execResult: execResult.result, noResult, auth });
+    return result;
 };
 
 module.exports = {

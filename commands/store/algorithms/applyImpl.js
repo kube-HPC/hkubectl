@@ -26,7 +26,8 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, auth, name, setCurre
         // wait for build
         const spinner = ora({ text: `build ${buildId} in progress.`, spinner: 'line' }).start();
         let lastStatus = '';
-        const buildResult = await getUntil({ endpoint, rejectUnauthorized, path: `builds/status/${buildId}`, auth,
+        const buildResult = await getUntil({
+            endpoint, rejectUnauthorized, path: `builds/status/${buildId}`, auth,
         }, (res) => {
             if (lastStatus !== res.result.status) {
                 spinner.text = res.result.status;
@@ -39,7 +40,8 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, auth, name, setCurre
         let versionId = null;
         this._kc_token = await auth.getToken();
         if (!newVersion) {
-            const allVersions = await get({ endpoint, rejectUnauthorized, path: `versions/algorithms/${name}`, headers: { Authorization: `Bearer ${this._kc_token}` }
+            const allVersions = await get({
+                endpoint, rejectUnauthorized, path: `versions/algorithms/${name}`, headers: { Authorization: `Bearer ${this._kc_token}` }
             });
             const foundVersion = allVersions.result.find(v => v.buildId === buildId);
             if (foundVersion) {
@@ -160,7 +162,6 @@ const adaptCliData = (cliData) => {
 const handleApply = async ({ endpoint, rejectUnauthorized, username, password, name, file, noWait, setCurrent, ...cli }) => {
     let result;
     let error;
-    console.log('handleApply() before auth'); // logs for e2e
     const auth = new AuthManager({
         username,
         password,
@@ -168,8 +169,8 @@ const handleApply = async ({ endpoint, rejectUnauthorized, username, password, n
         rejectUnauthorized
     });
     await auth.init();
-    console.log('handleApply() after auth'); // logs for e2e
     const spinner = ora({ text: 'Build starting', spinner: 'line' }).start();
+    let buildResult = {};
     try {
         let stream;
         let fileData;
@@ -233,19 +234,22 @@ const handleApply = async ({ endpoint, rejectUnauthorized, username, password, n
             headers: { Authorization: `Bearer ${this._kc_token}` }
         });
         spinner.succeed();
+
         if (result.result) {
             console.log(result.result.messages.join('\n'));
             if (!noWait) {
-                await waitForBuild({ endpoint, rejectUnauthorized, auth, name: body.name, setCurrent, applyRes: { result } });
+                buildResult = await waitForBuild({ endpoint, rejectUnauthorized, auth, name: body.name, setCurrent, applyRes: { result } });
             }
         }
+        auth.stop();
     }
     catch (e) {
         error = e.message;
         spinner.fail();
+        auth.stop();
     }
     return {
-        error: error || result.error, result
+        error: error || result.error, result, buildStatus: buildResult.buildStatus
     };
 };
 

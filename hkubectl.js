@@ -25,7 +25,6 @@ const handleSignals = () => {
         process.exit(0);
     });
     process.on('exit', () => {
-        console.trace();
     });
 };
 const main = async () => {

@@ -26,6 +26,7 @@ async function importAlgorithms(argv, algorithmData, overwrite) {
             console.log(`Successfully imported ${result.name}`);
         }
     });
+    auth.stop();
 }
 
 async function importPipelines(argv, pipelinedata, overwrite) {
@@ -53,6 +54,7 @@ async function importPipelines(argv, pipelinedata, overwrite) {
             console.log(`Successfully imported ${result.name}`);
         }
     });
+    auth.stop();
 }
 
 const replaceValsInFile = (fileContent, Mappings) => {

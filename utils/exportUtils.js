@@ -18,8 +18,10 @@ async function getAlgorithms(argv) {
         headers: { Authorization: `Bearer ${this._kc_token}` }
     });
     if (!algorithms || !algorithms.result) {
+        auth.stop();
         return algorithms;
     }
+    auth.stop();
     return algorithms.result;
 }
 
@@ -40,8 +42,10 @@ async function getPipelines(argv) {
         headers: { Authorization: `Bearer ${this._kc_token}` }
     });
     if (!pipelines || !pipelines.result) {
+        auth.stop();
         return pipelines;
     }
+    auth.stop();
     return pipelines.result;
 }
 

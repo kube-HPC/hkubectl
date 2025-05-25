@@ -16,18 +16,21 @@ class AuthManager {
     }
 
     async init() {
-        console.log('starting auth manager loop'); // logs for e2e
-        await this._login();
-        console.log('login from init'); // logs for e2e
-        this._startRefreshLoop();
+        if (this.username) {
+            await this._login();
+            this._startRefreshLoop();
+        }
     }
 
     async getToken() {
-        const now = Math.floor(Date.now() / 1000);
-        if (now >= this.expiresAt - 10) {
-            await this._login(); // proactively refresh if close to expiry
+        if (this.username) {
+            const now = Math.floor(Date.now() / 1000);
+            if (now >= this.expiresAt - 10) {
+                await this._login(); // proactively refresh if close to expiry
+            }
+            return this.token;
         }
-        return this.token;
+        return undefined;
     }
 
     async _login() {
@@ -52,12 +55,9 @@ class AuthManager {
 
     _startRefreshLoop() {
         if (this.refreshTimer) clearInterval(this.refreshTimer);
-
         this.refreshTimer = setInterval(async () => {
             try {
-                console.log('login loop in interval'); // logs for e2e
                 await this._login();
-                console.log('login from loop'); // logs for e2e
             }
             catch (err) {
                 console.warn('[AuthManager] Periodic login failed, will retry on next getToken()');

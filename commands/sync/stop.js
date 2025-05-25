@@ -27,7 +27,7 @@ const stopHandler = async ({ endpoint, rejectUnauthorized, username, password, a
         return;
     }
     console.log(`algorithm ${algorithmName} removed from development mode.`);
-    process.exit(0); // release terminal
+    auth.stop();
 };
 module.exports = {
     command: 'stop',

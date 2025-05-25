@@ -49,6 +49,7 @@ const handleAdd = async ({ endpoint, rejectUnauthorized, username, password, fil
     if (readmeFile) {
         await readmeAdd(readmeFile, endpoint, username, password, rejectUnauthorized, result.name, auth);
     }
+    auth.stop();
     return res;
 };
 

@@ -36,12 +36,16 @@ const executeHandler = async ({ endpoint, rejectUnauthorized, username, password
     });
 
     if (execResult.error) {
+        auth.stop();
         return execResult.error;
     }
     if (noWait) {
+        auth.stop();
         return execResult.result;
     }
-    return waitForBuild({ endpoint, rejectUnauthorized, username, password, execResult: execResult.result, noResult, auth });
+    result = await waitForBuild({ endpoint, rejectUnauthorized, username, password, execResult: execResult.result, noResult, auth });
+    auth.stop();
+    return result;
 };
 
 module.exports = {

@@ -13,11 +13,13 @@ const list = async (argv) => {
     await auth.init();
     this._kc_token = await auth.getToken();
     const path = 'store/algorithms';
-    return get({
+    const result = await get({
         ...argv,
         path,
         headers: { Authorization: `Bearer ${this._kc_token}` }
     });
+    auth.stop();
+    return result;
 };
 
 module.exports = {

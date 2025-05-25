@@ -60,22 +60,22 @@ const startMenu = (printMenu = false) => {
             startMenu(true);
         };
         switch (answer) {
-        case '1':
-            printScrollingLine('Pressed 1, restarting pods, update in progress...', false, false, false);
-            awaitCase1();
-            break;
-        case '2':
-            process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
-            printScrollingLine('Exiting...', false, false);
-            syncthing._proc.kill();
-            _finishedUpdate();
-            break;
-        default:
-            process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
-            printScrollingLine('Invalid option. Please try again. ', true, false);
-            // eslint-disable-next-line no-unused-vars
-            startMenu();
-            break;
+            case '1':
+                printScrollingLine('Pressed 1, restarting pods, update in progress...', false, false, false);
+                awaitCase1();
+                break;
+            case '2':
+                process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
+                printScrollingLine('Exiting...', false, false);
+                syncthing._proc.kill();
+                _finishedUpdate();
+                break;
+            default:
+                process.stdout.write(cursorUpCleanLine); // Move cursor up one line and clear it
+                printScrollingLine('Invalid option. Please try again. ', true, false);
+                // eslint-disable-next-line no-unused-vars
+                startMenu();
+                break;
         }
     });
 };
@@ -102,6 +102,7 @@ const watchHandler = async ({ endpoint, rejectUnauthorized, username, password, 
     const res = await get({ endpoint: this._endpoint, rejectUnauthorized: this._rejectUnauthorized, path: `store/algorithms/${algorithmName}`, headers: { Authorization: `Bearer ${this._kc_token}` } });
     if (res.error && res.error.message) {
         console.error(`error getting algorithm ${algorithmName}. Error: ${res.error.message}`);
+        auth.stop();
         return;
     }
     this._syncPath = urlPrefix + path.join(baseUrl, agentSyncIngressPath); // avoids removing the '//' after the protocol
@@ -123,24 +124,26 @@ const watchHandler = async ({ endpoint, rejectUnauthorized, username, password, 
         await syncthing.addFolder({ path: fullPath, algorithmName, bidi });
         syncthing.on('event', data => {
             if (data.folder !== algorithmName) {
+                auth.stop();
                 return;
             }
             switch (data.type) {
-            case events.FolderSummary:
-                if (!(data.name === 'local')) {
-                    printScrollingLine(`Algorithm ${data.folder} update started `);
-                }
-                break;
-            case events.FolderCompletion:
-                if (!(data.name === 'local')) {
-                    printScrollingLine(`Algorithm ${data.folder} update done   `);
-                }
-                break;
-            default:
-                break;
+                case events.FolderSummary:
+                    if (!(data.name === 'local')) {
+                        printScrollingLine(`Algorithm ${data.folder} update started `);
+                    }
+                    break;
+                case events.FolderCompletion:
+                    if (!(data.name === 'local')) {
+                        printScrollingLine(`Algorithm ${data.folder} update done   `);
+                    }
+                    break;
+                default:
+                    break;
             }
         });
         startMenu(true);
+        auth.stop();
     }
     catch (error) {
         console.error(`error connecting sync server. Error: ${error.message}`);
