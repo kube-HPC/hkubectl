@@ -3,7 +3,7 @@ const objectPath = require('object-path');
 const { getUntil, get } = require('./request-helper');
 const { jobExecEvents } = require('./consts');
 
-const waitForBuild = async ({ endpoint, rejectUnauthorized, execResult, noResult }) => {
+const waitForBuild = async ({ endpoint, rejectUnauthorized, execResult, noResult, auth }) => {
     const { jobId } = execResult;
     let jobStatus = jobExecEvents.completed;
     let jobResult;
@@ -12,7 +12,7 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, execResult, noResult
         const spinner = ora({ text: `execution ${jobId} in progress.`, spinner: 'line' }).start();
         let lastStatus = '';
         let lastProgress = '';
-        const statusResult = await getUntil({ endpoint, rejectUnauthorized, path: `exec/status/${jobId}` }, (res) => {
+        const statusResult = await getUntil({ endpoint, rejectUnauthorized, path: `exec/status/${jobId}`, auth }, (res) => {
             const currentStatus = objectPath.get(res, 'result.status', '');
             const currentProgress = objectPath.get(res, 'result.data.details', '');
             if (lastStatus !== currentStatus || lastProgress !== currentProgress) {
@@ -33,7 +33,10 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, execResult, noResult
             spinner.succeed();
             return { jobId, jobStatus };
         }
-        const executionResult = await get({ endpoint, rejectUnauthorized, path: `exec/results/${jobId}` });
+        this._kc_token = await auth.getToken();
+        const executionResult = await get({
+            endpoint, rejectUnauthorized, path: `exec/results/${jobId}`, headers: { Authorization: `Bearer ${this._kc_token}` }
+        });
         if (executionResult.error) {
             spinner.fail();
             return { jobStatus, error: executionResult.error, jobId };

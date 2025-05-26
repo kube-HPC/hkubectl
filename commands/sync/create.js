@@ -3,7 +3,7 @@ const { handleApply } = require('../store/algorithms/applyImpl');
 const { buildDoneEvents } = require('../../helpers/consts');
 const { askMissingValues } = require('../../helpers/input');
 
-const createHandler = async ({ endpoint, rejectUnauthorized, algorithmName, folder, entryPoint, env, baseImage, $0: appName }) => {
+const createHandler = async ({ endpoint, rejectUnauthorized, username, password, algorithmName, folder, entryPoint, env, baseImage, $0: appName }) => {
     try {
         const fullFolderPath = path.resolve(folder);
         const algorithmData = {
@@ -16,16 +16,19 @@ const createHandler = async ({ endpoint, rejectUnauthorized, algorithmName, fold
             baseImage
         };
         const { buildStatus } = await handleApply({
-            endpoint, rejectUnauthorized, name: algorithmName, wait: true, forceVersion: true, ...algorithmData
+            endpoint, rejectUnauthorized, username, password, name: algorithmName, wait: true, forceVersion: true, ...algorithmData
         });
+        console.log(`build status is ${JSON.stringify(buildStatus)}`);
         if (buildStatus === buildDoneEvents.completed) {
             console.log(`algorithm ${algorithmName} is ready`);
             console.log('to sync the folder to the algorithm run');
             console.log(`${appName} sync watch -a ${algorithmName} -f ${folder}`);
         }
+        process.exit(0); // release terminal
     }
     catch (error) {
         console.error(`error Creating algorithm. Error: ${error.message}`);
+        process.exit(0); // release terminal
     }
 };
 module.exports = {

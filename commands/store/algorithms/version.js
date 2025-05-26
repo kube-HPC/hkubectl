@@ -1,8 +1,17 @@
 const { get, post } = require('../../../helpers/request-helper');
 const { log } = require('../../../helpers/output');
+const { AuthManager } = require('../../../helpers/authentication/auth-manager');
 
-const getHandler = async ({ endpoint, rejectUnauthorized, name, verbose, setCurrent, force }) => {
+const getHandler = async ({ endpoint, rejectUnauthorized, username, password, name, verbose, setCurrent, force }) => {
     let ret;
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
+    this._kc_token = await auth.getToken();
     if (setCurrent) {
         const path = 'versions/algorithms/apply';
         ret = await post({
@@ -13,9 +22,11 @@ const getHandler = async ({ endpoint, rejectUnauthorized, name, verbose, setCurr
                 name,
                 image: setCurrent,
                 force: !!force
-            }
+            },
+            headers: { Authorization: `Bearer ${this._kc_token}` }
         });
         if (verbose) {
+            auth.stop();
             return ret;
         }
         return ret.error ? ret.error : { version: ret.result.algorithmImage };
@@ -24,12 +35,16 @@ const getHandler = async ({ endpoint, rejectUnauthorized, name, verbose, setCurr
     ret = await get({
         endpoint,
         rejectUnauthorized,
-        path
+        path,
+        headers: { Authorization: `Bearer ${this._kc_token}` }
     });
     if (verbose) {
+        auth.stop();
         return ret;
     }
-    return { name, versions: ret.result.map(r => r.algorithmImage) };
+    const result = { name, versions: ret.result.map(r => r.algorithmImage) };
+    auth.stop();
+    return result;
 };
 
 module.exports = {

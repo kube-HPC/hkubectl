@@ -7,14 +7,13 @@ const FormData = require('form-data');
 const ora = require('ora');
 const expandTilde = require('expand-tilde');
 const formatSize = require('pretty-bytes');
-
+const { AuthManager } = require('../../../helpers/authentication/auth-manager');
 const { postFile, getUntil, post, get } = require('../../../helpers/request-helper');
 const { zipDirectory } = require('../../../helpers/zipper');
 const { buildDoneEvents } = require('../../../helpers/consts');
-
 const applyPath = 'store/algorithms/apply';
 
-const waitForBuild = async ({ endpoint, rejectUnauthorized, name, setCurrent, applyRes }) => {
+const waitForBuild = async ({ endpoint, rejectUnauthorized, auth, name, setCurrent, applyRes }) => {
     const error = applyRes.error || applyRes.result.error;
     if (error) {
         console.error(error.message || error);
@@ -27,7 +26,9 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, name, setCurrent, ap
         // wait for build
         const spinner = ora({ text: `build ${buildId} in progress.`, spinner: 'line' }).start();
         let lastStatus = '';
-        const buildResult = await getUntil({ endpoint, rejectUnauthorized, path: `builds/status/${buildId}` }, (res) => {
+        const buildResult = await getUntil({
+            endpoint, rejectUnauthorized, path: `builds/status/${buildId}`, auth,
+        }, (res) => {
             if (lastStatus !== res.result.status) {
                 spinner.text = res.result.status;
             }
@@ -37,8 +38,11 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, name, setCurrent, ap
         const { algorithmImage, version, semver, status } = buildResult.result;
         let newVersion = version || semver;
         let versionId = null;
+        this._kc_token = await auth.getToken();
         if (!newVersion) {
-            const allVersions = await get({ endpoint, rejectUnauthorized, path: `versions/algorithms/${name}` });
+            const allVersions = await get({
+                endpoint, rejectUnauthorized, path: `versions/algorithms/${name}`, headers: { Authorization: `Bearer ${this._kc_token}` }
+            });
             const foundVersion = allVersions.result.find(v => v.buildId === buildId);
             if (foundVersion) {
                 newVersion = foundVersion.semver;
@@ -58,7 +62,8 @@ const waitForBuild = async ({ endpoint, rejectUnauthorized, name, setCurrent, ap
                         image: algorithmImage,
                         version: versionId,
                         force: true
-                    }
+                    },
+                    headers: { Authorization: `Bearer ${this._kc_token}` }
                 });
             }
             else {
@@ -154,10 +159,18 @@ const adaptCliData = (cliData) => {
     };
 };
 
-const handleApply = async ({ endpoint, rejectUnauthorized, name, file, noWait, setCurrent, ...cli }) => {
+const handleApply = async ({ endpoint, rejectUnauthorized, username, password, name, file, noWait, setCurrent, ...cli }) => {
     let result;
     let error;
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
     const spinner = ora({ text: 'Build starting', spinner: 'line' }).start();
+    let buildResult = {};
     try {
         let stream;
         let fileData;
@@ -212,26 +225,31 @@ const handleApply = async ({ endpoint, rejectUnauthorized, name, file, noWait, s
         formData.append('payload', JSON.stringify(body));
         formData.append('file', stream || '');
 
+        this._kc_token = await auth.getToken();
         result = await postFile({
             endpoint,
             rejectUnauthorized,
             formData,
-            path: applyPath
+            path: applyPath,
+            headers: { Authorization: `Bearer ${this._kc_token}` }
         });
         spinner.succeed();
+
         if (result.result) {
             console.log(result.result.messages.join('\n'));
             if (!noWait) {
-                await waitForBuild({ endpoint, rejectUnauthorized, name: body.name, setCurrent, applyRes: { result } });
+                buildResult = await waitForBuild({ endpoint, rejectUnauthorized, auth, name: body.name, setCurrent, applyRes: { result } });
             }
         }
+        auth.stop();
     }
     catch (e) {
         error = e.message;
         spinner.fail();
+        auth.stop();
     }
     return {
-        error: error || result.error, result
+        error: error || result.error, result, buildStatus: buildResult.buildStatus
     };
 };
 

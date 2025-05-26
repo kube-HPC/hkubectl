@@ -1,13 +1,25 @@
 const { log } = require('../../helpers/output');
 const { get } = require('../../helpers/request-helper');
+const { AuthManager } = require('../../helpers/authentication/auth-manager');
 
-const executeHandler = async ({ endpoint, rejectUnauthorized, jobId }) => {
+const executeHandler = async ({ endpoint, rejectUnauthorized, username, password, jobId }) => {
     const path = `exec/results/${jobId}`;
-    return get({
+    const auth = new AuthManager({
+        username,
+        password,
+        endpoint,
+        rejectUnauthorized
+    });
+    await auth.init();
+    this._kc_token = await auth.getToken();
+    const result = await get({
         endpoint,
         rejectUnauthorized,
-        path
+        path,
+        headers: { Authorization: `Bearer ${this._kc_token}` }
     });
+    auth.stop();
+    return result;
 };
 
 module.exports = {

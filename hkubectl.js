@@ -24,6 +24,8 @@ const handleSignals = () => {
         await syncthing.remove();
         process.exit(0);
     });
+    process.on('exit', () => {
+    });
 };
 const main = async () => {
     handleSignals();
@@ -65,6 +67,16 @@ const main = async () => {
     yargs.options('verbose', {
         description: 'verbose logging',
         type: 'boolean'
+    });
+    yargs.options('username', {
+        description: 'kc username',
+        type: 'string',
+        describe: false
+    });
+    yargs.options('password', {
+        description: 'kc password',
+        type: 'string',
+        describe: false
     });
     yargs.options('json', {
         description: 'output json to stdout',
