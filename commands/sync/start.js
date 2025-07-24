@@ -53,5 +53,6 @@ module.exports = {
     },
     handler: async (argv) => {
         await startHandler(argv);
+        process.stdin.pause();
     }
 };
