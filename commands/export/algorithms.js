@@ -52,6 +52,7 @@ module.exports = {
                 alias: ['f']
             },
         });
+        process.stdin.pause();
     },
     handler: async (argv) => {
         // eslint-disable-next-line no-param-reassign

@@ -73,6 +73,7 @@ module.exports = {
                 default: false,
             },
         });
+        process.stdin.pause();
     },
     handler: async (argv) => {
         const ret = await executeHandler(argv);

@@ -54,6 +54,7 @@ module.exports = {
             describe: 'path/of/your/directory',
             type: 'string'
         });
+        process.stdin.pause();
     },
     handler: async (argv) => {
         // eslint-disable-next-line no-param-reassign
