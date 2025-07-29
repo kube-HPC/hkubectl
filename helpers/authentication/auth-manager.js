@@ -68,7 +68,6 @@ class AuthManager {
     stop() {
         if (this.refreshTimer) {
             clearInterval(this.refreshTimer);
-            this.refreshTimer = null;
         }
     }
 }

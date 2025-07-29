@@ -1,5 +1,3 @@
-const https = require('https');
-
 const { get } = require('../../../helpers/request-helper');
 const { log } = require('../../../helpers/output');
 const { AuthManager } = require('../../../helpers/authentication/auth-manager');
@@ -21,11 +19,10 @@ const list = async (argv) => {
         ...argv,
         path,
         headers: { Authorization: `Bearer ${token}` },
-        agent: new https.Agent({ keepAlive: false }) // temporary force close
     });
 
     if (!algorithms || !algorithms.result) {
-        await auth.stop();
+        auth.stop();
         return algorithms;
     }
 
