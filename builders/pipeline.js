@@ -6,6 +6,7 @@ const pipelines = {
     builder: (yargs) => {
         Object.values(commands).forEach((cmd) => {
             yargs.command(cmd);
+            process.stdin.pause();
         });
         yargs.options('endpoint', {
             description: 'url of hkube api endpoint',

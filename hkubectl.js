@@ -97,6 +97,7 @@ const main = async () => {
     if (!args._[0]) {
         if (args.endpoint) {
             yargs.showHelp();
+            process.stdin.pause();
         }
         else {
             config.handler(args);

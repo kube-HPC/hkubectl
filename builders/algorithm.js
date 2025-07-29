@@ -6,6 +6,7 @@ const algorithms = {
     builder: (yargs) => {
         Object.values(commands).forEach((cmd) => {
             yargs.command(cmd);
+            process.stdin.pause();
         });
         return yargs;
     },

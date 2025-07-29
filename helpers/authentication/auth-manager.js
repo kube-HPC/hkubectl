@@ -37,7 +37,7 @@ class AuthManager {
         try {
             const data = await post({
                 endpoint: this.endpoint,
-                rejectUnauthorized: this.endpoint,
+                rejectUnauthorized: this.rejectUnauthorized,
                 path: this.authUrl,
                 body: { username: this.username, password: this.password }
             });
@@ -66,7 +66,9 @@ class AuthManager {
     }
 
     stop() {
-        if (this.refreshTimer) clearInterval(this.refreshTimer);
+        if (this.refreshTimer) {
+            clearInterval(this.refreshTimer);
+        }
     }
 }
 
