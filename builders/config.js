@@ -46,7 +46,7 @@ const handler = async ({ endpoint, rejectUnauthorized, ...rest }) => {
     catch (error) {
         // Keycloak doesnt exist, flag stays false.
     }
-
+    let res;
     if (keycloakExists) {
         answers2 = await inquirer.prompt([
             {
@@ -62,19 +62,32 @@ const handler = async ({ endpoint, rejectUnauthorized, ...rest }) => {
             }
         ]);
     }
+    else {
+        // Keycloak is not available on this endpoint. Clear any previously saved credentials
+        // so stale username/password won't trigger auth in future runs.
+        answers2 = { username: null, password: null };
+    }
     const answers = { ...answers1, ...answers2 };
     await writeValues(answers);
-    // const answers = { endpoint, rejectUnauthorized };
+    let tokenFromLogin;
     console.log(`Values saved in ${await resolveConfigPath()}`);
-    let res = await post({ endpoint: answers.endpoint, rejectUnauthorized: answers.rejectUnauthorized, path: '/auth/login', body: { username: answers.username, password: answers.password } });
-    if (!res || !res.result) {
-        if (res.error.message) {
-            console.log(chalk.red(`Login failed - ${res.error.message}`));
+    if (keycloakExists) {
+        res = await post({ endpoint: answers.endpoint, rejectUnauthorized: answers.rejectUnauthorized, path: '/auth/login', body: { username: answers.username, password: answers.password } });
+        if (!res || !res.result) {
+            if (res.error.message) {
+                console.log(chalk.red(`Login failed - ${res.error.message}`));
+            }
+            return;
         }
-        return;
+        tokenFromLogin = res.result.data.access_token;
     }
     const spinner = ora({ text: 'Validating config...', spinner: 'line' }).start();
-    res = await get({ ...answers, path: '/storage/info', timeout: 1000, headers: { Authorization: `Bearer ${res.result.data.access_token}` } });
+    res = await get({
+        ...answers,
+        path: '/storage/info',
+        timeout: 1000,
+        headers: tokenFromLogin ? { Authorization: `Bearer ${tokenFromLogin}` } : undefined
+    });
     if (!res || !res.result) {
         spinner.fail();
         console.error(chalk`{red failed} to connect to api-server at ${answers.endpoint}`);
