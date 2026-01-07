@@ -8,6 +8,19 @@ const sleep = promisify(setTimeout);
 
 const apiPrefix = 'api/v1/';
 
+const sanitizeHeaders = (headers = {}) => {
+    const sanitized = { ...headers };
+    const auth = sanitized.Authorization || sanitized.authorization;
+    if (typeof auth === 'string') {
+        const trimmed = auth.trim();
+        if (/^Bearer\s*(undefined|null)?$/i.test(trimmed)) {
+            delete sanitized.Authorization;
+            delete sanitized.authorization;
+        }
+    }
+    return sanitized;
+};
+
 const uriBuilder = ({ endpoint, path, qs = {} }) => {
     let prefix = apiPrefix;
     const { pathPrefix } = global.args || {};
@@ -32,7 +45,7 @@ const _request = async ({ endpoint, rejectUnauthorized, path, method, body, form
             json: true,
             data: body || formData,
             headers: {
-                ...headers,
+                ...sanitizeHeaders(headers),
                 ...(formData ? formData.getHeaders() : {})
             },
             timeout,
@@ -69,7 +82,12 @@ const getUntil = async (getOptions, condition, timeout = 20000) => {
             return { error: 'time out waiting for condition' };
         }
         this._kc_token = await auth.getToken();
-        getOptionsNoCredentials.headers = { Authorization: `Bearer ${this._kc_token}` };
+        if (this._kc_token) {
+            getOptionsNoCredentials.headers = { Authorization: `Bearer ${this._kc_token}` };
+        }
+        else {
+            delete getOptionsNoCredentials.headers;
+        }
         const res = await get(getOptionsNoCredentials);
         const conditionResult = condition(res);
         if (conditionResult) {
