@@ -40,7 +40,7 @@
     "deep-diff": "^1.0.2",
     "expand-tilde": "^2.0.2",
     "find-up": "^4.1.0",
-    "form-data": "^3.0.0",
+    "form-data": "^3.0.4",
     "fs-extra": "^9.1.0",
     "get-port": "^5.1.1",
     "get-stdin": "^8.0.0",
